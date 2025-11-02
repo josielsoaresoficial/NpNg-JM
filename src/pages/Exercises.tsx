@@ -95,6 +95,7 @@ const Exercises = () => {
           </DialogContent>
         </Dialog>
 
+        {/* Bottom Navigation */}
         <BottomNav currentPage="exercises" />
       </div>
     </Layout>
