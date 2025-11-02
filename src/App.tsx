@@ -14,6 +14,7 @@ import Progress from "./pages/Progress";
 import Profile from "./pages/Profile";
 import Exercises from "./pages/Exercises";
 import Explore from "./pages/Explore";
+import ProgramDetail from "./pages/ProgramDetail";
 import Body from "./pages/Body";
 import Activities from "./pages/Activities";
 import NotFound from "./pages/NotFound";
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="/workouts" element={<Workouts />} />
             <Route path="/activities" element={<Activities />} />
             <Route path="/explore" element={<Explore />} />
+            <Route path="/program/:id" element={<ProgramDetail />} />
             <Route path="/exercises" element={<Exercises />} />
             <Route path="/body" element={<Body />} />
             <Route path="/nutrition" element={<Nutrition />} />
