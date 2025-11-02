@@ -147,8 +147,13 @@ const AnimatedExercise: React.FC<AnimatedExerciseProps> = ({ animation, size = '
 
   const animations: Record<string, React.ReactNode> = {
     'supino_reto': <SupinoRetoAnimation />,
+    'supino_inclinado': <SupinoRetoAnimation />,
+    'supino_inclinado_halteres': <SupinoRetoAnimation />,
+    'supino_declinado': <SupinoRetoAnimation />,
     'agachamento_livre': <AgachamentoAnimation />,
     'crucifixo': <CrucifixoAnimation />,
+    'crucifixo_inclinado': <CrucifixoAnimation />,
+    'crucifixo_reto': <CrucifixoAnimation />,
     'remada_halter': <RemadaAnimation />,
     'remada_barra': <RemadaAnimation />,
     'corrida': <CorridaAnimation />,
@@ -162,7 +167,11 @@ const AnimatedExercise: React.FC<AnimatedExerciseProps> = ({ animation, size = '
     'elevacao_lateral': <DesenvolvimentoAnimation />,
     'levantamento_terra': <AgachamentoAnimation />,
     'abdominal_supra': <AbdominalAnimation />,
-    'aducao': <AgachamentoAnimation />
+    'aducao': <AgachamentoAnimation />,
+    'flexao': <SupinoRetoAnimation />,
+    'cross_over': <CrucifixoAnimation />,
+    'paralelas': <RemadaAnimation />,
+    'pullover': <SupinoRetoAnimation />
   };
 
   return (

@@ -3,9 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ChevronDown, ChevronUp, Play } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp, Play, Info, ChevronRight, Target, Clock, Dumbbell } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { toast } from "sonner";
+import { chestExercises, chestWorkoutProgram } from "@/data/chestExercisesData";
+import ExerciseDetailModal from "@/components/ExerciseDetailModal";
+import type { ChestExercise } from "@/data/chestExercisesData";
 
 // Mapeamento de nomes de músculos para dados de treino
 const muscleWorkoutData: Record<string, {
@@ -422,12 +425,29 @@ export default function MuscleWorkoutPage() {
   const { muscleName } = useParams<{ muscleName: string }>();
   const navigate = useNavigate();
   const [expandedDescription, setExpandedDescription] = useState(false);
+  const [selectedExercise, setSelectedExercise] = useState<ChestExercise | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Buscar dados do treino ou usar padrão
-  const workoutData = muscleWorkoutData[muscleName?.toLowerCase() || ""] || {
-    ...defaultWorkoutData,
-    title: `Foco em ${muscleName?.charAt(0).toUpperCase()}${muscleName?.slice(1)}`,
-    tags: [muscleName?.charAt(0).toUpperCase() + muscleName?.slice(1) || "Músculo", "Força", "Hipertrofia"]
+  const workoutData = muscleName?.toLowerCase() === 'peitoral'
+    ? chestWorkoutProgram
+    : (muscleWorkoutData[muscleName?.toLowerCase() || ""] || {
+      ...defaultWorkoutData,
+      title: `Foco em ${muscleName?.charAt(0).toUpperCase()}${muscleName?.slice(1)}`,
+      tags: [muscleName?.charAt(0).toUpperCase() + muscleName?.slice(1) || "Músculo", "Força", "Hipertrofia"]
+    });
+
+  const handleExerciseClick = (exerciseName: string) => {
+    // Para peitoral, usar o banco de dados específico
+    if (muscleName?.toLowerCase() === 'peitoral') {
+      const exerciseId = Object.keys(chestExercises).find(
+        key => chestExercises[key].name === exerciseName
+      );
+      if (exerciseId) {
+        setSelectedExercise(chestExercises[exerciseId]);
+        setIsModalOpen(true);
+      }
+    }
   };
 
   const handleStartWorkout = () => {
@@ -474,7 +494,7 @@ export default function MuscleWorkoutPage() {
 
         {/* Title */}
         <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-          {workoutData.title}
+          {'title' in workoutData ? workoutData.title : workoutData.name}
         </h1>
 
         {/* Description Card */}
@@ -529,27 +549,40 @@ export default function MuscleWorkoutPage() {
 
                 {/* Exercise List */}
                 <div className="divide-y divide-border/50">
-                  {day.exercises.map((exercise, exerciseIndex) => (
-                    <button
-                      key={exerciseIndex}
-                      className="w-full p-3 flex items-center gap-3 hover:bg-muted/50 transition-colors text-left"
-                      onClick={() => {/* Pode adicionar navegação para detalhes do exercício aqui */}}
-                    >
-                      {/* Play Button Icon */}
-                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <Play className="w-5 h-5 text-primary fill-primary" />
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm">{exercise.name}</p>
-                        {exercise.sets && (
-                          <p className="text-xs text-orange-600 font-medium mt-0.5">
-                            {exercise.sets}
-                          </p>
+                  {day.exercises.map((exercise: any, exerciseIndex: number) => {
+                    const exerciseName = typeof exercise === 'string' 
+                      ? (muscleName?.toLowerCase() === 'peitoral' ? chestExercises[exercise]?.name : exercise)
+                      : exercise.name;
+                    const exerciseSets = typeof exercise === 'string'
+                      ? (muscleName?.toLowerCase() === 'peitoral' ? `${chestExercises[exercise]?.sets}x${chestExercises[exercise]?.reps}` : '')
+                      : exercise.sets;
+
+                    return (
+                      <button
+                        key={exerciseIndex}
+                        className="w-full p-3 flex items-center gap-3 hover:bg-muted/50 transition-colors text-left"
+                        onClick={() => handleExerciseClick(exerciseName)}
+                      >
+                        {/* Play Button Icon */}
+                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Play className="w-5 h-5 text-primary fill-primary" />
+                        </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm">{exerciseName}</p>
+                          {exerciseSets && (
+                            <p className="text-xs text-orange-600 font-medium mt-0.5">
+                              {exerciseSets}
+                            </p>
+                          )}
+                        </div>
+                        
+                        {muscleName?.toLowerCase() === 'peitoral' && (
+                          <Info className="w-4 h-4 text-muted-foreground" />
                         )}
-                      </div>
-                    </button>
-                  ))}
+                      </button>
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
@@ -570,6 +603,15 @@ export default function MuscleWorkoutPage() {
           </div>
         </div>
       </div>
+
+      {/* Modal de Detalhes do Exercício */}
+      {muscleName?.toLowerCase() === 'peitoral' && (
+        <ExerciseDetailModal
+          exercise={selectedExercise}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </Layout>
   );
 }
