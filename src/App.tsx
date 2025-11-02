@@ -13,6 +13,9 @@ import Nutrition from "./pages/Nutrition";
 import Progress from "./pages/Progress";
 import Profile from "./pages/Profile";
 import Exercises from "./pages/Exercises";
+import Explore from "./pages/Explore";
+import Body from "./pages/Body";
+import Activities from "./pages/Activities";
 import NotFound from "./pages/NotFound";
 import OnboardingFlow from "./components/onboarding/OnboardingFlow";
 import ResetPassword from "./pages/ResetPassword";
@@ -43,10 +46,13 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/workouts" element={<Workouts />} />
+            <Route path="/activities" element={<Activities />} />
+            <Route path="/explore" element={<Explore />} />
+            <Route path="/exercises" element={<Exercises />} />
+            <Route path="/body" element={<Body />} />
             <Route path="/nutrition" element={<Nutrition />} />
             <Route path="/progress" element={<Progress />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/exercises" element={<Exercises />} />
             <Route path="/stats/calories-burned" element={<CaloriesBurnedPage />} />
             <Route path="/stats/hydration" element={<HydrationPage />} />
             <Route path="/stats/protein-goal" element={<ProteinGoalPage />} />

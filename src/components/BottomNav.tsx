@@ -1,9 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Activity, Search, Dumbbell, User } from "lucide-react";
+import { Dumbbell, TrendingUp, Compass, Target, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface BottomNavProps {
-  currentPage?: "dashboard" | "workouts" | "explore" | "exercises" | "profile";
+  currentPage?: "workouts" | "activities" | "explore" | "exercises" | "body";
 }
 
 export function BottomNav({ currentPage }: BottomNavProps) {
@@ -17,15 +17,15 @@ export function BottomNav({ currentPage }: BottomNavProps) {
   };
 
   const navItems = [
-    { icon: Home, label: "Treinos", path: "/workouts" },
-    { icon: Activity, label: "Atividades", path: "/progress" },
-    { icon: Search, label: "Explorar", path: "/dashboard" },
-    { icon: Dumbbell, label: "Exercícios", path: "/exercises" },
-    { icon: User, label: "Corpo", path: "/profile" },
+    { icon: Dumbbell, label: "Treinos", path: "/workouts", page: "workouts" },
+    { icon: TrendingUp, label: "Atividades", path: "/activities", page: "activities" },
+    { icon: Compass, label: "Explorar", path: "/explore", page: "explore" },
+    { icon: Target, label: "Exercícios", path: "/exercises", page: "exercises" },
+    { icon: User, label: "Corpo", path: "/body", page: "body" },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 pb-safe z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-border pb-safe z-50">
       <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -42,14 +42,14 @@ export function BottomNav({ currentPage }: BottomNavProps) {
             >
               <Icon
                 className={cn(
-                  "w-5 h-5",
-                  active ? "text-black" : "text-gray-400"
+                  "w-5 h-5 transition-colors",
+                  active ? "text-primary" : "text-muted-foreground"
                 )}
               />
               <span
                 className={cn(
-                  "text-xs font-medium",
-                  active ? "text-black" : "text-gray-400"
+                  "text-xs font-medium transition-colors",
+                  active ? "text-primary" : "text-muted-foreground"
                 )}
               >
                 {item.label}
