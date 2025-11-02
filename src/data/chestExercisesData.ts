@@ -27,34 +27,37 @@ export const chestExercises: Record<string, ChestExercise> = {
     day: 'Dia 1 - Peitoral Superior',
     type: 'principal',
     difficulty: 'Intermediário',
-    focus: 'Porção superior do peitoral',
+    focus: 'Porção superior do peitoral (clavicular)',
     muscleGroup: 'peitoral',
-    equipment: ['banco inclinado', 'barra', 'pesos'],
+    equipment: ['banco inclinado', 'barra', 'anilhas'],
     sets: 4,
     reps: '8-12',
     restTime: 60,
-    description: 'Exercício fundamental para desenvolvimento da porção clavicular do peitoral',
+    description: 'Exercício fundamental para desenvolvimento da porção clavicular (superior) do peitoral, focando na parte superior do peito',
     instructions: [
       'Ajuste o banco em 30-45 graus de inclinação',
-      'Deite-se com pés firmes no chão',
-      'Segure a barra com pegada pronada, mãos mais largas que os ombros',
-      'Desça a barra controladamente até a altura do peito superior',
-      'Empurre explosivamente até a posição inicial',
-      'Mantenha escápulas retraídas durante todo o movimento'
+      'Deite-se com pés firmes no chão para estabilidade',
+      'Segure a barra com pegada pronada, mãos ligeiramente mais largas que os ombros',
+      'Desça a barra controladamente até a altura do peito superior (porção clavicular)',
+      'Empurre a barra verticalmente até a posição inicial, estendendo os cotovelos sem travar',
+      'Mantenha as escápulas retraídas durante todo o movimento'
     ],
     tips: [
-      'Não arqueie excessivamente as costas',
-      'Mantenha os punhos alinhados com os antebraços',
+      'Mantenha os ombros "travados" e retraídos para proteger a articulação',
+      'Respire fundo na descida (fase excêntrica) e expire na subida (fase concêntrica)',
+      'A tensão deve estar concentrada no peitoral superior',
       'Controle a fase excêntrica (descida) por 2-3 segundos',
-      'Expire na fase concêntrica (subida)',
-      'Use um spotter para cargas pesadas'
+      'Use um spotter para cargas pesadas',
+      'Mantenha os punhos alinhados com os antebraços'
     ],
     animation: 'supino_inclinado',
     commonMistakes: [
-      'Bloquear os cotovelos no topo',
-      'Arquear demais as costas',
-      'Deixar os pés suspensos',
-      'Usar amplitude muito curta'
+      'Travar os cotovelos no topo do movimento',
+      'Deixar o quadril levantar do banco',
+      'Descer a barra rápido demais (falta de controle)',
+      'Arquear excessivamente as costas',
+      'Usar amplitude muito curta',
+      'Deixar os pés suspensos ou instáveis'
     ]
   },
   'crucifixo_inclinado': {

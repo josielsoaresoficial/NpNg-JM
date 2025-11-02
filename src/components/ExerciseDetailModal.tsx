@@ -31,15 +31,15 @@ const ExerciseDetailModal = ({ exercise, isOpen, onClose }: ExerciseDetailModalP
             <div className="flex-1">
               <h2 className="text-2xl font-bold mb-2">{exercise.name}</h2>
               <div className="flex flex-wrap gap-3 text-sm">
-                <Badge variant="secondary" className="gap-1">
+                <Badge className="gap-1 bg-[#FF9800] hover:bg-[#F57C00] text-white border-0">
                   <Dumbbell className="w-3 h-3" />
                   {exercise.day}
                 </Badge>
-                <Badge variant="secondary" className="gap-1">
+                <Badge className="gap-1 bg-[#FF9800] hover:bg-[#F57C00] text-white border-0">
                   <Clock className="w-3 h-3" />
                   {exercise.sets}x{exercise.reps} • {exercise.restTime}s
                 </Badge>
-                <Badge variant="secondary">{exercise.difficulty}</Badge>
+                <Badge className="bg-[#FF9800] hover:bg-[#F57C00] text-white border-0">{exercise.difficulty}</Badge>
               </div>
             </div>
             <Button
@@ -68,17 +68,17 @@ const ExerciseDetailModal = ({ exercise, isOpen, onClose }: ExerciseDetailModalP
             
             {/* Informações Rápidas */}
             <div className="mt-6 space-y-3">
-              <div className="flex justify-between items-center p-3 bg-primary/10 rounded-lg">
+              <div className="flex justify-between items-center p-3 bg-primary/10 rounded-lg border-l-4 border-primary">
                 <span className="font-medium">Séries</span>
-                <span className="text-primary font-bold">{exercise.sets}</span>
+                <span className="text-primary font-bold text-xl">{exercise.sets}</span>
               </div>
-              <div className="flex justify-between items-center p-3 bg-primary/10 rounded-lg">
+              <div className="flex justify-between items-center p-3 bg-primary/10 rounded-lg border-l-4 border-primary">
                 <span className="font-medium">Repetições</span>
-                <span className="text-primary font-bold">{exercise.reps}</span>
+                <span className="text-primary font-bold text-xl">{exercise.reps}</span>
               </div>
-              <div className="flex justify-between items-center p-3 bg-primary/10 rounded-lg">
+              <div className="flex justify-between items-center p-3 bg-primary/10 rounded-lg border-l-4 border-primary">
                 <span className="font-medium">Descanso</span>
-                <span className="text-primary font-bold">{exercise.restTime}s</span>
+                <span className="text-primary font-bold text-xl">{exercise.restTime}s</span>
               </div>
             </div>
 
@@ -148,13 +148,16 @@ const ExerciseDetailModal = ({ exercise, isOpen, onClose }: ExerciseDetailModalP
             {/* Conteúdo das Abas */}
             {activeTab === 'instructions' && (
               <div className="space-y-4">
-                <h3 className="text-xl font-semibold mb-4">Como Executar</h3>
+                <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                  <Info className="w-6 h-6 text-primary" />
+                  Como Executar
+                </h3>
                 {exercise.instructions.map((instruction, index) => (
-                  <div key={index} className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
-                    <div className="bg-primary text-primary-foreground rounded-full w-7 h-7 flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  <div key={index} className="flex items-start gap-3 p-4 bg-primary/5 rounded-lg border-l-4 border-primary">
+                    <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold flex-shrink-0">
                       {index + 1}
                     </div>
-                    <p className="text-sm pt-0.5">{instruction}</p>
+                    <p className="text-sm pt-1 leading-relaxed">{instruction}</p>
                   </div>
                 ))}
               </div>
@@ -162,11 +165,14 @@ const ExerciseDetailModal = ({ exercise, isOpen, onClose }: ExerciseDetailModalP
 
             {activeTab === 'tips' && (
               <div className="space-y-3">
-                <h3 className="text-xl font-semibold mb-4">Dicas Importantes</h3>
+                <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                  <CheckCircle className="w-6 h-6 text-primary" />
+                  Dicas Importantes
+                </h3>
                 {exercise.tips.map((tip, index) => (
-                  <div key={index} className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
+                  <div key={index} className="flex items-start gap-3 p-4 bg-primary/5 rounded-lg border-l-4 border-primary">
                     <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <p className="text-sm">{tip}</p>
+                    <p className="text-sm leading-relaxed">{tip}</p>
                   </div>
                 ))}
               </div>
@@ -174,11 +180,14 @@ const ExerciseDetailModal = ({ exercise, isOpen, onClose }: ExerciseDetailModalP
 
             {activeTab === 'mistakes' && exercise.commonMistakes && (
               <div className="space-y-3">
-                <h3 className="text-xl font-semibold mb-4">Evite Estes Erros</h3>
+                <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                  <AlertCircle className="w-6 h-6 text-destructive" />
+                  Evite Estes Erros
+                </h3>
                 {exercise.commonMistakes.map((mistake, index) => (
-                  <div key={index} className="flex items-start gap-3 p-3 bg-destructive/10 rounded-lg">
+                  <div key={index} className="flex items-start gap-3 p-4 bg-destructive/10 rounded-lg border-l-4 border-destructive">
                     <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
-                    <p className="text-sm">{mistake}</p>
+                    <p className="text-sm leading-relaxed">{mistake}</p>
                   </div>
                 ))}
               </div>
@@ -191,7 +200,7 @@ const ExerciseDetailModal = ({ exercise, isOpen, onClose }: ExerciseDetailModalP
           <div className="flex gap-3">
             <Button
               onClick={startExercise}
-              className="flex-1 gap-2"
+              className="flex-1 gap-2 bg-primary hover:bg-primary/90"
               size="lg"
             >
               <Play className="w-5 h-5" />
