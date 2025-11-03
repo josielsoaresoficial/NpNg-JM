@@ -136,7 +136,7 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
     ));
   };
 
-  const handleDragStart = (e: React.MouseEvent, muscle: string) => {
+  const handleDragStart = (e: React.MouseEvent | React.TouchEvent, muscle: string) => {
     if (!isEditing) return;
     e.preventDefault();
     setDraggedLabel(muscle);
@@ -145,21 +145,27 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
     if (!label) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
     setDragOffset({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
+      x: clientX - rect.left,
+      y: clientY - rect.top
     });
   };
 
-  const handleDragMove = (e: React.MouseEvent) => {
+  const handleDragMove = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isEditing || !draggedLabel) return;
     
     const container = document.getElementById('muscle-map-container');
     if (!container) return;
 
     const containerRect = container.getBoundingClientRect();
-    const topPercent = ((e.clientY - containerRect.top - dragOffset.y) / containerRect.height) * 100;
-    const leftPercent = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
+    const topPercent = ((clientY - containerRect.top - dragOffset.y) / containerRect.height) * 100;
+    const leftPercent = ((clientX - containerRect.left) / containerRect.width) * 100;
 
     setLabels(prev => prev.map(label => 
       label.muscle === draggedLabel
@@ -263,90 +269,88 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
 
   return (
     <div className="relative w-full flex flex-col items-center justify-center py-0 gap-2">
-      {/* Edit Controls - Apenas Desktop */}
-      {!isMobile && (
-        <>
-          <div className="flex gap-2 flex-wrap justify-center">
-              <Button 
-                variant={isEditing ? "default" : "outline"} 
-                size="default"
-                className={`gap-2 ${isEditing ? 'animate-pulse' : ''}`}
-                onClick={() => setIsEditing(!isEditing)}
-              >
-                <Edit2 className="w-4 h-4" />
-                {isEditing ? "Modo Editor Ativo" : "🎨 Ativar Modo Editor"}
+      {/* Edit Controls */}
+      <div className="w-full">
+        <div className="flex gap-2 flex-wrap justify-center">
+          <Button 
+            variant={isEditing ? "default" : "outline"} 
+            size="default"
+            className={`gap-2 ${isEditing ? 'animate-pulse' : ''}`}
+            onClick={() => setIsEditing(!isEditing)}
+          >
+            <Edit2 className="w-4 h-4" />
+            {isEditing ? "Modo Editor Ativo" : "🎨 Ativar Modo Editor"}
+          </Button>
+
+          {isEditing && (
+            <>
+              <Button variant="outline" size="default" className="gap-2" onClick={handleSavePositions}>
+                <Save className="w-4 h-4" />
+                Salvar Posições
               </Button>
+              <Button variant="outline" size="default" onClick={handleResetPositions}>
+                Resetar
+              </Button>
+              <Button variant="outline" size="default" className="gap-2" onClick={() => setShowAddDialog(true)}>
+                <PlusCircle className="w-4 h-4" />
+                Adicionar Label
+              </Button>
+            </>
+          )}
 
-              {isEditing && (
-                <>
-                  <Button variant="outline" size="default" className="gap-2" onClick={handleSavePositions}>
-                    <Save className="w-4 h-4" />
-                    Salvar Posições
-                  </Button>
-                  <Button variant="outline" size="default" onClick={handleResetPositions}>
-                    Resetar
-                  </Button>
-                  <Button variant="outline" size="default" className="gap-2" onClick={() => setShowAddDialog(true)}>
-                    <PlusCircle className="w-4 h-4" />
-                    Adicionar Label
-                  </Button>
-                </>
-              )}
-
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" size="default" className="gap-2">
-                    <Settings className="w-4 h-4" />
-                    Ajustes Globais
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-80">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="label-size">Tamanho do Texto Padrão: {labelSize}px</Label>
-                      <Slider
-                        id="label-size"
-                        min={10}
-                        max={24}
-                        step={1}
-                        value={[labelSize]}
-                        onValueChange={(value) => setLabelSize(value[0])}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="line-width">Largura da Linha Padrão: {lineWidth}px</Label>
-                      <Slider
-                        id="line-width"
-                        min={20}
-                        max={100}
-                        step={5}
-                        value={[lineWidth]}
-                        onValueChange={(value) => setLineWidth(value[0])}
-                      />
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {isEditing && (
-              <Card className="bg-primary/5 border-primary/20 p-4 max-w-2xl">
-                <div className="text-sm space-y-2">
-                  <p className="font-semibold text-primary flex items-center gap-2">
-                    <Edit2 className="w-4 h-4" />
-                    Como usar o Modo Editor:
-                  </p>
-                  <ul className="space-y-1 text-muted-foreground ml-4">
-                    <li>• <strong>Arrastar:</strong> Clique e segure em qualquer label para mover livremente em todas as direções</li>
-                    <li>• <strong>Editar Texto:</strong> Clique no label para abrir controles e ajustar tamanho do texto (+ / -)</li>
-                    <li>• <strong>Editar Linha:</strong> Use os controles do label para ajustar tamanho da linha conectora (+ / -)</li>
-                    <li>• <strong>Salvar:</strong> Não esqueça de clicar em "Salvar Posições" quando terminar</li>
-                  </ul>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="default" className="gap-2">
+                <Settings className="w-4 h-4" />
+                Ajustes Globais
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="label-size">Tamanho do Texto Padrão: {labelSize}px</Label>
+                  <Slider
+                    id="label-size"
+                    min={10}
+                    max={24}
+                    step={1}
+                    value={[labelSize]}
+                    onValueChange={(value) => setLabelSize(value[0])}
+                  />
                 </div>
-              </Card>
-            )}
-        </>
-      )}
+                <div className="space-y-2">
+                  <Label htmlFor="line-width">Largura da Linha Padrão: {lineWidth}px</Label>
+                  <Slider
+                    id="line-width"
+                    min={20}
+                    max={100}
+                    step={5}
+                    value={[lineWidth]}
+                    onValueChange={(value) => setLineWidth(value[0])}
+                  />
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        {isEditing && (
+          <Card className="bg-primary/5 border-primary/20 p-4 max-w-2xl mt-2">
+            <div className="text-sm space-y-2">
+              <p className="font-semibold text-primary flex items-center gap-2">
+                <Edit2 className="w-4 h-4" />
+                Como usar o Modo Editor:
+              </p>
+              <ul className="space-y-1 text-muted-foreground ml-4">
+                <li>• <strong>Arrastar:</strong> {isMobile ? 'Toque e segure' : 'Clique e segure'} em qualquer label para mover livremente</li>
+                <li>• <strong>Editar Texto:</strong> {isMobile ? 'Toque' : 'Clique'} no label para abrir controles e ajustar tamanho do texto (+ / -)</li>
+                <li>• <strong>Editar Linha:</strong> Use os controles do label para ajustar tamanho da linha conectora (+ / -)</li>
+                <li>• <strong>Salvar:</strong> Não esqueça de clicar em "Salvar Posições" quando terminar</li>
+              </ul>
+            </div>
+          </Card>
+        )}
+      </div>
 
       <div
         id="muscle-map-container"
@@ -354,6 +358,8 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
         onMouseMove={handleDragMove}
         onMouseUp={handleDragEnd}
         onMouseLeave={handleDragEnd}
+        onTouchMove={handleDragMove}
+        onTouchEnd={handleDragEnd}
       >
         {/* Body Image - transparent background adapts to theme */}
         <div className="relative flex items-center justify-center transition-all duration-300 ease-in-out">
@@ -380,8 +386,9 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
                 left: label.side === "left" && label.left ? label.left : undefined,
                 right: label.side === "right" && label.right ? label.right : undefined
               }}
-              onClick={(e) => (isEditing && !isMobile) ? handleToggleLabelEdit(label.muscle, e) : handleLabelClick(label.muscle)}
-              onMouseDown={(e) => (isEditing && !isMobile) && handleDragStart(e, label.muscle)}
+              onClick={(e) => isEditing ? handleToggleLabelEdit(label.muscle, e) : handleLabelClick(label.muscle)}
+              onMouseDown={(e) => isEditing && handleDragStart(e, label.muscle)}
+              onTouchStart={(e) => isEditing && handleDragStart(e, label.muscle)}
             >
               <div className="space-y-1">
                 <div className={`flex items-center ${label.side === "left" ? "flex-row" : "flex-row-reverse"} gap-1`}>
