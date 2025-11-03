@@ -84,14 +84,16 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
 
   const handleSavePositions = () => {
     localStorage.setItem(storageKey, JSON.stringify(labels));
-    toast.success("Posições salvas com sucesso!");
+    const deviceType = isMobile ? "Mobile 📱" : "Desktop 🖥️";
+    toast.success(`Posições salvas para ${deviceType}! A outra versão permanece inalterada.`);
   };
 
   const handleResetPositions = () => {
     const defaultLabels = view === "front" ? frontLabels : backLabels;
     setLabels(defaultLabels);
     localStorage.removeItem(storageKey);
-    toast.success("Posições resetadas!");
+    const deviceType = isMobile ? "Mobile 📱" : "Desktop 🖥️";
+    toast.success(`Posições resetadas para ${deviceType}! A outra versão permanece inalterada.`);
   };
 
   const handleFlipSide = (muscle: string) => {
@@ -267,15 +269,20 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
       {!isMobile && (
         <>
           <div className="flex gap-2 flex-wrap justify-center">
-              <Button 
-                variant={isEditing ? "default" : "outline"} 
-                size="default"
-                className={`gap-2 ${isEditing ? 'animate-pulse' : ''}`}
-                onClick={() => setIsEditing(!isEditing)}
-              >
-                <Edit2 className="w-4 h-4" />
-                {isEditing ? "Modo Editor Ativo" : "🎨 Ativar Modo Editor"}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant={isEditing ? "default" : "outline"} 
+                  size="default"
+                  className={`gap-2 ${isEditing ? 'animate-pulse' : ''}`}
+                  onClick={() => setIsEditing(!isEditing)}
+                >
+                  <Edit2 className="w-4 h-4" />
+                  {isEditing ? "Modo Editor Ativo" : "🎨 Ativar Modo Editor"}
+                </Button>
+                <span className="text-xs font-medium text-muted-foreground px-2 py-1 bg-accent/30 rounded">
+                  Editando: Versão Desktop 🖥️
+                </span>
+              </div>
 
               {isEditing && (
                 <>
@@ -341,6 +348,7 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
                     <li>• <strong>Editar Texto:</strong> Clique no label para abrir controles e ajustar tamanho do texto (+ / -)</li>
                     <li>• <strong>Editar Linha:</strong> Use os controles do label para ajustar tamanho da linha conectora (+ / -)</li>
                     <li>• <strong>Salvar:</strong> Não esqueça de clicar em "Salvar Posições" quando terminar</li>
+                    <li className="text-primary font-semibold mt-2">⚠️ As alterações aqui só afetam a versão Desktop. Mobile tem sua própria configuração independente.</li>
                   </ul>
                 </div>
               </Card>
