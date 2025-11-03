@@ -19,50 +19,50 @@ interface MuscleLabel {
   lineWidth?: number;
 }
 
-// Posições ajustadas - Desktop
+// Posições ajustadas - Desktop (baseado nas imagens de referência)
 const frontLabelsDesktop: MuscleLabel[] = [
-  { name: "Peitoral", muscle: "chest", side: "right", top: "23.166666666666668%", right: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Ombros", muscle: "shoulders", side: "left", top: "18.333333333333332%", left: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Bíceps", muscle: "biceps", side: "left", top: "31.666666666666668%", left: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Abdômen", muscle: "abs", side: "right", top: "38.333333333333336%", right: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Antebraços", muscle: "forearms", side: "right", top: "50%", right: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Oblíquos", muscle: "obliques", side: "left", top: "46.666666666666664%", left: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Quadríceps", muscle: "legs", side: "left", top: "65%", left: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Adutores", muscle: "adductors", side: "right", top: "65%", right: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Panturrilhas", muscle: "calves", side: "right", top: "81.66666666666667%", right: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Ombros", muscle: "shoulders", side: "left", top: "20%", left: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Peitoral", muscle: "chest", side: "right", top: "23%", right: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Bíceps", muscle: "biceps", side: "left", top: "32%", left: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Abdômen", muscle: "abs", side: "right", top: "37%", right: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Oblíquos", muscle: "obliques", side: "left", top: "43%", left: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Antebraços", muscle: "forearms", side: "right", top: "48%", right: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Abdutores", muscle: "adductors", side: "left", top: "57%", left: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Adutores", muscle: "adductors", side: "right", top: "62%", right: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Quadríceps", muscle: "legs", side: "left", top: "70%", left: "3.125%", fontSize: 14, lineWidth: 40 },
 ];
 
 const backLabelsDesktop: MuscleLabel[] = [
-  { name: "Trapézio", muscle: "traps", side: "right", top: "16.666666666666668%", right: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Dorsais", muscle: "back", side: "right", top: "31.666666666666668%", right: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Tríceps", muscle: "triceps", side: "left", top: "31.666666666666668%", left: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Lombares", muscle: "lower_back", side: "left", top: "45%", left: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Glúteos", muscle: "glutes", side: "right", top: "51.666666666666664%", right: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Isquiotibiais", muscle: "hamstrings", side: "left", top: "65%", left: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Panturrilhas", muscle: "calves", side: "right", top: "80%", right: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Trapézio", muscle: "traps", side: "right", top: "18%", right: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Tríceps", muscle: "triceps", side: "left", top: "30%", left: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Dorsais", muscle: "back", side: "right", top: "32%", right: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Lombares", muscle: "lower_back", side: "left", top: "44%", left: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Glúteos", muscle: "glutes", side: "right", top: "50%", right: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Isquiotibiais", muscle: "hamstrings", side: "left", top: "64%", left: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Panturrilhas", muscle: "calves", side: "right", top: "78%", right: "3.125%", fontSize: 14, lineWidth: 40 },
 ];
 
-// Posições ajustadas - Mobile
+// Posições ajustadas - Mobile (baseado nas imagens de referência)
 const frontLabelsMobile: MuscleLabel[] = [
-  { name: "Peitoral", muscle: "chest", side: "right", top: "23.166666666666668%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Ombros", muscle: "shoulders", side: "left", top: "18.333333333333332%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Bíceps", muscle: "biceps", side: "left", top: "31.666666666666668%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Abdômen", muscle: "abs", side: "right", top: "38.333333333333336%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Antebraços", muscle: "forearms", side: "right", top: "50%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Oblíquos", muscle: "obliques", side: "left", top: "46.666666666666664%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Quadríceps", muscle: "legs", side: "left", top: "65%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Adutores", muscle: "adductors", side: "right", top: "65%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Panturrilhas", muscle: "calves", side: "right", top: "81.66666666666667%", right: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Ombros", muscle: "shoulders", side: "left", top: "20%", left: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Peitoral", muscle: "chest", side: "right", top: "23%", right: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Bíceps", muscle: "biceps", side: "left", top: "32%", left: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Abdômen", muscle: "abs", side: "right", top: "37%", right: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Oblíquos", muscle: "obliques", side: "left", top: "43%", left: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Antebraços", muscle: "forearms", side: "right", top: "48%", right: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Abdutores", muscle: "adductors", side: "left", top: "57%", left: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Adutores", muscle: "adductors", side: "right", top: "62%", right: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Quadríceps", muscle: "legs", side: "left", top: "70%", left: "0%", fontSize: 12, lineWidth: 35 },
 ];
 
 const backLabelsMobile: MuscleLabel[] = [
-  { name: "Trapézio", muscle: "traps", side: "right", top: "16.666666666666668%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Dorsais", muscle: "back", side: "right", top: "31.666666666666668%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Tríceps", muscle: "triceps", side: "left", top: "31.666666666666668%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Lombares", muscle: "lower_back", side: "left", top: "45%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Glúteos", muscle: "glutes", side: "right", top: "51.666666666666664%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Isquiotibiais", muscle: "hamstrings", side: "left", top: "65%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Panturrilhas", muscle: "calves", side: "right", top: "80%", right: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Trapézio", muscle: "traps", side: "right", top: "18%", right: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Tríceps", muscle: "triceps", side: "left", top: "30%", left: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Dorsais", muscle: "back", side: "right", top: "32%", right: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Lombares", muscle: "lower_back", side: "left", top: "44%", left: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Glúteos", muscle: "glutes", side: "right", top: "50%", right: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Isquiotibiais", muscle: "hamstrings", side: "left", top: "64%", left: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Panturrilhas", muscle: "calves", side: "right", top: "78%", right: "0%", fontSize: 12, lineWidth: 35 },
 ];
 
 export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: WorkoutMuscleMapProps) {
