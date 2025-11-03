@@ -25,6 +25,7 @@ interface MuscleLabel {
   lineLength: number;
   fontSize: string;
   lineType: 'straight' | 'curved';
+  hideLineAndPoint?: boolean;
 }
 
 const frontLabels: MuscleLabel[] = [
@@ -389,6 +390,55 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
     }));
   };
   
+  const handleLineTypeChange = (lineType: "straight" | "curved") => {
+    if (!selectedLabel) return;
+    setEditableLabels(prev => prev.map(label => 
+      label.muscle === selectedLabel ? { ...label, lineType } : label
+    ));
+  };
+  
+  const handleToggleLineAndPoint = () => {
+    if (!selectedLabel) return;
+    setEditableLabels(prev => prev.map(label => 
+      label.muscle === selectedLabel ? { ...label, hideLineAndPoint: !label.hideLineAndPoint } : label
+    ));
+  };
+  
+  const handleAddLabel = () => {
+    const newMuscle = `novo_musculo_${Date.now()}`;
+    const deviceKey = isMobile ? 'mobile' : 'desktop';
+    const newLabel: MuscleLabel = {
+      name: "Novo Músculo",
+      muscle: newMuscle,
+      side: "left",
+      position: {
+        desktop: { top: "50%", left: "10%" },
+        mobile: { top: "50%", left: "5%" }
+      },
+      lineLength: 60,
+      fontSize: "14px",
+      lineType: 'straight',
+      hideLineAndPoint: false
+    };
+    setEditableLabels(prev => [...prev, newLabel]);
+    setSelectedLabel(newMuscle);
+    toast.success("Novo label adicionado!");
+  };
+  
+  const handleRemoveLabel = () => {
+    if (!selectedLabel) return;
+    setEditableLabels(prev => prev.filter(label => label.muscle !== selectedLabel));
+    toast.success("Label removido!");
+    setSelectedLabel(null);
+  };
+  
+  const handleNameChange = (newName: string) => {
+    if (!selectedLabel) return;
+    setEditableLabels(prev => prev.map(label => 
+      label.muscle === selectedLabel ? { ...label, name: newName } : label
+    ));
+  };
+  
   const selectedLabelData = editableLabels.find(l => l.muscle === selectedLabel);
 
   return (
@@ -425,6 +475,17 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
       {isEditing && (
         <Card className="w-full max-w-[600px] z-30">
           <CardContent className="pt-6 space-y-4">
+            <div className="flex gap-2">
+              <Button onClick={handleAddLabel} variant="default" className="flex-1">
+                Adicionar Label
+              </Button>
+              {selectedLabel && (
+                <Button onClick={handleRemoveLabel} variant="destructive" className="flex-1">
+                  Remover Label
+                </Button>
+              )}
+            </div>
+            
             <div>
               <label className="text-sm font-medium mb-2 block">Selecionar Músculo:</label>
               <Select value={selectedLabel || ""} onValueChange={setSelectedLabel}>
@@ -443,6 +504,16 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
             
             {selectedLabelData && (
               <>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Nome do Label:</label>
+                  <input
+                    type="text"
+                    value={selectedLabelData.name}
+                    onChange={(e) => handleNameChange(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-md"
+                  />
+                </div>
+                
                 <div>
                   <label className="text-sm font-medium mb-2 block">
                     Tamanho da Fonte: {selectedLabelData.fontSize}
@@ -487,6 +558,36 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
                       Direita
                     </Button>
                   </div>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Tipo de Linha:</label>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => handleLineTypeChange("straight")}
+                      variant={selectedLabelData.lineType === "straight" ? "default" : "outline"}
+                      className="flex-1"
+                    >
+                      Reta
+                    </Button>
+                    <Button
+                      onClick={() => handleLineTypeChange("curved")}
+                      variant={selectedLabelData.lineType === "curved" ? "default" : "outline"}
+                      className="flex-1"
+                    >
+                      Curva
+                    </Button>
+                  </div>
+                </div>
+                
+                <div>
+                  <Button
+                    onClick={handleToggleLineAndPoint}
+                    variant={selectedLabelData.hideLineAndPoint ? "default" : "outline"}
+                    className="w-full"
+                  >
+                    {selectedLabelData.hideLineAndPoint ? "Mostrar Linha e Ponto" : "Ocultar Linha e Ponto"}
+                  </Button>
                 </div>
                 
                 <div className="text-xs text-muted-foreground space-y-1">
@@ -565,19 +666,21 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
                   </div>
 
                   {/* Line and Point */}
-                  <div className="relative flex items-center">
-                    <div
-                      className={`h-[1px] ${
-                        selectedMuscle === label.muscle ? "bg-primary" : "bg-muted-foreground group-hover:bg-primary"
-                      } transition-colors duration-200`}
-                      style={{ width: `${label.lineLength}px` }}
-                    />
-                    <div
-                      className={`w-2 h-2 rounded-full ${
-                        selectedMuscle === label.muscle ? "bg-primary" : "bg-muted-foreground group-hover:bg-primary"
-                      } transition-colors duration-200`}
-                    />
-                  </div>
+                  {!label.hideLineAndPoint && (
+                    <div className="relative flex items-center">
+                      <div
+                        className={`h-[1px] ${
+                          selectedMuscle === label.muscle ? "bg-primary" : "bg-muted-foreground group-hover:bg-primary"
+                        } transition-colors duration-200`}
+                        style={{ width: `${label.lineLength}px` }}
+                      />
+                      <div
+                        className={`w-2 h-2 rounded-full ${
+                          selectedMuscle === label.muscle ? "bg-primary" : "bg-muted-foreground group-hover:bg-primary"
+                        } transition-colors duration-200`}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             );
