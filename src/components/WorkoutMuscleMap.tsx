@@ -1,6 +1,9 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import bodyFrontWorkout from "@/assets/body-front-workout-transparent.png";
 import bodyBackWorkout from "@/assets/body-back-workout-transparent.png";
+import { toast } from "sonner";
 
 interface WorkoutMuscleMapProps {
   view: "front" | "back";
@@ -70,19 +73,123 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
   const isMobile = window.innerWidth < 768;
   
   // Seleciona os labels corretos baseado na view e dispositivo
-  const labels = isMobile 
+  const baseLabels = isMobile 
     ? (view === "front" ? frontLabelsMobile : backLabelsMobile)
     : (view === "front" ? frontLabelsDesktop : backLabelsDesktop);
+  
+  // Estados para modo editor
+  const [isEditing, setIsEditing] = useState(false);
+  const [editableLabels, setEditableLabels] = useState<MuscleLabel[]>(baseLabels);
+  const [draggedLabel, setDraggedLabel] = useState<string | null>(null);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  
+  // Atualiza labels quando view ou dispositivo muda
+  useState(() => {
+    setEditableLabels(baseLabels);
+  });
+  
+  const labels = isEditing ? editableLabels : baseLabels;
 
   const handleLabelClick = (muscle: string) => {
+    if (isEditing) return; // Não navega no modo edição
     const label = labels.find(l => l.muscle === muscle);
     const muscleName = label ? label.name.toLowerCase() : muscle;
     navigate(`/workouts/muscle/${muscleName}`);
   };
+  
+  const handleDragStart = (e: React.MouseEvent | React.TouchEvent, muscle: string) => {
+    if (!isEditing) return;
+    e.preventDefault();
+    
+    const container = (e.currentTarget as HTMLElement).closest('.muscle-map-container');
+    if (!container) return;
+    
+    const rect = container.getBoundingClientRect();
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
+    const label = labels.find(l => l.muscle === muscle);
+    if (!label) return;
+    
+    const labelElement = e.currentTarget as HTMLElement;
+    const labelRect = labelElement.getBoundingClientRect();
+    
+    setDraggedLabel(muscle);
+    setDragOffset({
+      x: clientX - labelRect.left,
+      y: clientY - labelRect.top
+    });
+  };
+  
+  const handleDragMove = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isEditing || !draggedLabel) return;
+    e.preventDefault();
+    
+    const container = (e.currentTarget as HTMLElement);
+    const rect = container.getBoundingClientRect();
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
+    const x = clientX - rect.left - dragOffset.x;
+    const y = clientY - rect.top - dragOffset.y;
+    
+    const percentX = (x / rect.width) * 100;
+    const percentY = (y / rect.height) * 100;
+    
+    setEditableLabels(prev => prev.map(label => {
+      if (label.muscle === draggedLabel) {
+        return {
+          ...label,
+          top: `${percentY}%`,
+          left: label.side === "left" ? `${percentX}%` : undefined,
+          right: label.side === "right" ? `${100 - percentX}%` : undefined,
+        };
+      }
+      return label;
+    }));
+  };
+  
+  const handleDragEnd = () => {
+    setDraggedLabel(null);
+  };
+  
+  const handleSavePositions = () => {
+    const device = isMobile ? "Mobile" : "Desktop";
+    const viewType = view === "front" ? "front" : "back";
+    console.log(`${viewType}Labels${device}:`, editableLabels);
+    toast.success("Posições salvas com sucesso!");
+  };
 
   return (
-    <div className="relative w-full flex items-center justify-center py-4">
-      <div className="relative w-full max-w-[600px] flex items-center justify-center">
+    <div className="relative w-full flex flex-col items-center justify-center py-4 gap-4">
+      {/* Controles do Editor */}
+      <div className="flex gap-2 z-30">
+        <Button
+          onClick={() => {
+            setIsEditing(!isEditing);
+            if (!isEditing) {
+              setEditableLabels(baseLabels);
+            }
+          }}
+          variant={isEditing ? "destructive" : "default"}
+        >
+          {isEditing ? "Cancelar Edição" : "Ativar Modo Editor"}
+        </Button>
+        {isEditing && (
+          <Button onClick={handleSavePositions} variant="default">
+            Salvar Posições
+          </Button>
+        )}
+      </div>
+      
+      <div 
+        className="relative w-full max-w-[600px] flex items-center justify-center muscle-map-container"
+        onMouseMove={handleDragMove}
+        onMouseUp={handleDragEnd}
+        onMouseLeave={handleDragEnd}
+        onTouchMove={handleDragMove}
+        onTouchEnd={handleDragEnd}
+      >
         {/* Body Image */}
         <div className="relative flex items-center justify-center transition-all duration-300 ease-in-out">
           <img
@@ -98,13 +205,17 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
           {labels.map((label) => (
             <div
               key={label.muscle}
-              className="absolute pointer-events-auto cursor-pointer group transition-all duration-200"
+              className={`absolute pointer-events-auto group transition-all duration-200 ${
+                isEditing ? 'cursor-move' : 'cursor-pointer'
+              } ${draggedLabel === label.muscle ? 'z-50' : ''}`}
               style={{ 
                 top: label.top,
                 left: label.side === "left" && label.left ? label.left : undefined,
                 right: label.side === "right" && label.right ? label.right : undefined
               }}
               onClick={() => handleLabelClick(label.muscle)}
+              onMouseDown={(e) => handleDragStart(e, label.muscle)}
+              onTouchStart={(e) => handleDragStart(e, label.muscle)}
             >
               <div className={`flex items-center ${label.side === "left" ? "flex-row" : "flex-row-reverse"} gap-1`}>
                 {/* Label Text */}
