@@ -17,68 +17,244 @@ interface WorkoutMuscleMapProps {
 interface MuscleLabel {
   name: string;
   muscle: string;
+  position: {
+    desktop: { top: string; left?: string; right?: string };
+    mobile: { top: string; left?: string; right?: string };
+  };
   side: "left" | "right";
-  top: string;
-  left?: string;
-  right?: string;
-  fontSize?: number;
-  lineWidth?: number;
+  lineLength: number;
+  fontSize: string;
+  lineType: 'straight' | 'curved';
 }
 
-// Posições ajustadas - Desktop (baseado nas imagens de referência)
-const frontLabelsDesktop: MuscleLabel[] = [
-  { name: "Ombros", muscle: "shoulders", side: "left", top: "20%", left: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Peitoral", muscle: "chest", side: "right", top: "23%", right: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Bíceps", muscle: "biceps", side: "left", top: "32%", left: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Abdômen", muscle: "abs", side: "right", top: "37%", right: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Oblíquos", muscle: "obliques", side: "left", top: "43%", left: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Antebraços", muscle: "forearms", side: "right", top: "48%", right: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Abdutores", muscle: "adductors", side: "left", top: "57%", left: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Adutores", muscle: "adductors", side: "right", top: "62%", right: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Quadríceps", muscle: "legs", side: "left", top: "70%", left: "3.125%", fontSize: 14, lineWidth: 40 },
+const frontLabels: MuscleLabel[] = [
+  {
+    name: "Ombros",
+    muscle: "ombros",
+    side: "left",
+    position: {
+      desktop: { top: "18%", left: "10%" },
+      mobile: { top: "18%", left: "5%" }
+    },
+    lineLength: 60,
+    fontSize: "14px",
+    lineType: 'straight'
+  },
+  {
+    name: "Bíceps",
+    muscle: "biceps",
+    side: "left",
+    position: {
+      desktop: { top: "32%", left: "8%" },
+      mobile: { top: "32%", left: "3%" }
+    },
+    lineLength: 70,
+    fontSize: "14px",
+    lineType: 'straight'
+  },
+  {
+    name: "Oblíquos",
+    muscle: "obliquos",
+    side: "left",
+    position: {
+      desktop: { top: "46%", left: "5%" },
+      mobile: { top: "46%", left: "2%" }
+    },
+    lineLength: 80,
+    fontSize: "14px",
+    lineType: 'straight'
+  },
+  {
+    name: "Abdutores",
+    muscle: "abdutores",
+    side: "left",
+    position: {
+      desktop: { top: "60%", left: "3%" },
+      mobile: { top: "60%", left: "1%" }
+    },
+    lineLength: 90,
+    fontSize: "14px",
+    lineType: 'straight'
+  },
+  {
+    name: "Quadríceps",
+    muscle: "quadriceps",
+    side: "left",
+    position: {
+      desktop: { top: "74%", left: "2%" },
+      mobile: { top: "74%", left: "0%" }
+    },
+    lineLength: 95,
+    fontSize: "14px",
+    lineType: 'straight'
+  },
+  {
+    name: "Peitoral",
+    muscle: "peitoral",
+    side: "right",
+    position: {
+      desktop: { top: "22%", right: "10%" },
+      mobile: { top: "22%", right: "5%" }
+    },
+    lineLength: 60,
+    fontSize: "14px",
+    lineType: 'straight'
+  },
+  {
+    name: "Abdômen",
+    muscle: "abdomen",
+    side: "right",
+    position: {
+      desktop: { top: "38%", right: "8%" },
+      mobile: { top: "38%", right: "3%" }
+    },
+    lineLength: 70,
+    fontSize: "14px",
+    lineType: 'straight'
+  },
+  {
+    name: "Antebraços",
+    muscle: "antebracos",
+    side: "right",
+    position: {
+      desktop: { top: "52%", right: "5%" },
+      mobile: { top: "52%", right: "2%" }
+    },
+    lineLength: 80,
+    fontSize: "14px",
+    lineType: 'straight'
+  },
+  {
+    name: "Adutores",
+    muscle: "adutores",
+    side: "right",
+    position: {
+      desktop: { top: "66%", right: "3%" },
+      mobile: { top: "66%", right: "1%" }
+    },
+    lineLength: 90,
+    fontSize: "14px",
+    lineType: 'straight'
+  },
+  {
+    name: "Cardio",
+    muscle: "cardio",
+    side: "right",
+    position: {
+      desktop: { top: "80%", right: "2%" },
+      mobile: { top: "80%", right: "0%" }
+    },
+    lineLength: 95,
+    fontSize: "14px",
+    lineType: 'straight'
+  }
 ];
 
-const backLabelsDesktop: MuscleLabel[] = [
-  { name: "Trapézio", muscle: "traps", side: "right", top: "18%", right: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Tríceps", muscle: "triceps", side: "left", top: "30%", left: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Dorsais", muscle: "back", side: "right", top: "32%", right: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Lombares", muscle: "lower_back", side: "left", top: "44%", left: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Glúteos", muscle: "glutes", side: "right", top: "50%", right: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Isquiotibiais", muscle: "hamstrings", side: "left", top: "64%", left: "3.125%", fontSize: 14, lineWidth: 40 },
-  { name: "Panturrilhas", muscle: "calves", side: "right", top: "78%", right: "3.125%", fontSize: 14, lineWidth: 40 },
-];
-
-// Posições ajustadas - Mobile (baseado nas imagens de referência)
-const frontLabelsMobile: MuscleLabel[] = [
-  { name: "Ombros", muscle: "shoulders", side: "left", top: "20%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Peitoral", muscle: "chest", side: "right", top: "23%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Bíceps", muscle: "biceps", side: "left", top: "32%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Abdômen", muscle: "abs", side: "right", top: "37%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Oblíquos", muscle: "obliques", side: "left", top: "43%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Antebraços", muscle: "forearms", side: "right", top: "48%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Abdutores", muscle: "adductors", side: "left", top: "57%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Adutores", muscle: "adductors", side: "right", top: "62%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Quadríceps", muscle: "legs", side: "left", top: "70%", left: "0%", fontSize: 12, lineWidth: 35 },
-];
-
-const backLabelsMobile: MuscleLabel[] = [
-  { name: "Trapézio", muscle: "traps", side: "right", top: "18%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Tríceps", muscle: "triceps", side: "left", top: "30%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Dorsais", muscle: "back", side: "right", top: "32%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Lombares", muscle: "lower_back", side: "left", top: "44%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Glúteos", muscle: "glutes", side: "right", top: "50%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Isquiotibiais", muscle: "hamstrings", side: "left", top: "64%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Panturrilhas", muscle: "calves", side: "right", top: "78%", right: "0%", fontSize: 12, lineWidth: 35 },
+const backLabels: MuscleLabel[] = [
+  {
+    name: "Trapézio",
+    muscle: "trapezio",
+    side: "right",
+    position: {
+      desktop: { top: "16%", right: "10%" },
+      mobile: { top: "16%", right: "5%" }
+    },
+    lineLength: 60,
+    fontSize: "14px",
+    lineType: 'straight'
+  },
+  {
+    name: "Tríceps",
+    muscle: "triceps",
+    side: "left",
+    position: {
+      desktop: { top: "30%", left: "8%" },
+      mobile: { top: "30%", left: "3%" }
+    },
+    lineLength: 70,
+    fontSize: "14px",
+    lineType: 'straight'
+  },
+  {
+    name: "Dorsais",
+    muscle: "dorsais",
+    side: "right",
+    position: {
+      desktop: { top: "32%", right: "8%" },
+      mobile: { top: "32%", right: "3%" }
+    },
+    lineLength: 70,
+    fontSize: "14px",
+    lineType: 'straight'
+  },
+  {
+    name: "Lombares",
+    muscle: "lombares",
+    side: "left",
+    position: {
+      desktop: { top: "46%", left: "5%" },
+      mobile: { top: "46%", left: "2%" }
+    },
+    lineLength: 80,
+    fontSize: "14px",
+    lineType: 'straight'
+  },
+  {
+    name: "Glúteos",
+    muscle: "gluteos",
+    side: "right",
+    position: {
+      desktop: { top: "52%", right: "5%" },
+      mobile: { top: "52%", right: "2%" }
+    },
+    lineLength: 80,
+    fontSize: "14px",
+    lineType: 'straight'
+  },
+  {
+    name: "Isquiotibiais",
+    muscle: "isquiotibiais",
+    side: "left",
+    position: {
+      desktop: { top: "66%", left: "3%" },
+      mobile: { top: "66%", left: "1%" }
+    },
+    lineLength: 90,
+    fontSize: "14px",
+    lineType: 'straight'
+  },
+  {
+    name: "Cardio",
+    muscle: "cardio",
+    side: "right",
+    position: {
+      desktop: { top: "70%", right: "3%" },
+      mobile: { top: "70%", right: "1%" }
+    },
+    lineLength: 90,
+    fontSize: "14px",
+    lineType: 'straight'
+  },
+  {
+    name: "Panturrilhas",
+    muscle: "panturrilhas",
+    side: "left",
+    position: {
+      desktop: { top: "84%", left: "2%" },
+      mobile: { top: "84%", left: "0%" }
+    },
+    lineLength: 95,
+    fontSize: "14px",
+    lineType: 'straight'
+  }
 ];
 
 export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: WorkoutMuscleMapProps) {
   const navigate = useNavigate();
   const isMobile = window.innerWidth < 768;
   
-  // Seleciona os labels corretos baseado na view e dispositivo
-  const baseLabels = isMobile 
-    ? (view === "front" ? frontLabelsMobile : backLabelsMobile)
-    : (view === "front" ? frontLabelsDesktop : backLabelsDesktop);
+  // Seleciona os labels corretos baseado na view
+  const baseLabels = view === "front" ? frontLabels : backLabels;
   
   // Estados para modo editor
   const [isEditing, setIsEditing] = useState(false);
@@ -140,13 +316,20 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
     const percentX = (x / rect.width) * 100;
     const percentY = (y / rect.height) * 100;
     
+    const deviceKey = isMobile ? 'mobile' : 'desktop';
+    
     setEditableLabels(prev => prev.map(label => {
       if (label.muscle === draggedLabel) {
         return {
           ...label,
-          top: `${percentY}%`,
-          left: label.side === "left" ? `${percentX}%` : undefined,
-          right: label.side === "right" ? `${100 - percentX}%` : undefined,
+          position: {
+            ...label.position,
+            [deviceKey]: {
+              top: `${percentY}%`,
+              left: label.side === "left" ? `${percentX}%` : undefined,
+              right: label.side === "right" ? `${100 - percentX}%` : undefined,
+            }
+          }
         };
       }
       return label;
@@ -173,26 +356,33 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
   const handleFontSizeChange = (value: number[]) => {
     if (!selectedLabel) return;
     setEditableLabels(prev => prev.map(label => 
-      label.muscle === selectedLabel ? { ...label, fontSize: value[0] } : label
+      label.muscle === selectedLabel ? { ...label, fontSize: `${value[0]}px` } : label
     ));
   };
   
   const handleLineWidthChange = (value: number[]) => {
     if (!selectedLabel) return;
     setEditableLabels(prev => prev.map(label => 
-      label.muscle === selectedLabel ? { ...label, lineWidth: value[0] } : label
+      label.muscle === selectedLabel ? { ...label, lineLength: value[0] } : label
     ));
   };
   
   const handleSideChange = (side: "left" | "right") => {
     if (!selectedLabel) return;
+    const deviceKey = isMobile ? 'mobile' : 'desktop';
     setEditableLabels(prev => prev.map(label => {
       if (label.muscle === selectedLabel) {
         return {
           ...label,
           side,
-          left: side === "left" ? "3.125%" : undefined,
-          right: side === "right" ? "3.125%" : undefined,
+          position: {
+            ...label.position,
+            [deviceKey]: {
+              ...label.position[deviceKey],
+              left: side === "left" ? "3.125%" : undefined,
+              right: side === "right" ? "3.125%" : undefined,
+            }
+          }
         };
       }
       return label;
@@ -255,10 +445,10 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
               <>
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Tamanho da Fonte: {selectedLabelData.fontSize || 14}px
+                    Tamanho da Fonte: {selectedLabelData.fontSize}
                   </label>
                   <Slider
-                    value={[selectedLabelData.fontSize || 14]}
+                    value={[parseInt(selectedLabelData.fontSize)]}
                     onValueChange={handleFontSizeChange}
                     min={8}
                     max={24}
@@ -268,13 +458,13 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
                 
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Largura da Linha: {selectedLabelData.lineWidth || 40}px
+                    Comprimento da Linha: {selectedLabelData.lineLength}px
                   </label>
                   <Slider
-                    value={[selectedLabelData.lineWidth || 40]}
+                    value={[selectedLabelData.lineLength]}
                     onValueChange={handleLineWidthChange}
                     min={20}
-                    max={80}
+                    max={120}
                     step={5}
                   />
                 </div>
@@ -300,11 +490,12 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
                 </div>
                 
                 <div className="text-xs text-muted-foreground space-y-1">
-                  <p>Posição: top: {selectedLabelData.top}</p>
+                  <p>Dispositivo: {isMobile ? 'Mobile' : 'Desktop'}</p>
+                  <p>Posição: {isMobile ? selectedLabelData.position.mobile.top : selectedLabelData.position.desktop.top}</p>
                   <p>
                     {selectedLabelData.side === "left" 
-                      ? `left: ${selectedLabelData.left}` 
-                      : `right: ${selectedLabelData.right}`}
+                      ? `left: ${isMobile ? selectedLabelData.position.mobile.left : selectedLabelData.position.desktop.left}` 
+                      : `right: ${isMobile ? selectedLabelData.position.mobile.right : selectedLabelData.position.desktop.right}`}
                   </p>
                 </div>
               </>
@@ -333,19 +524,21 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
 
         {/* Muscle Labels */}
         <div className="absolute inset-0 pointer-events-none z-20">
-          {labels.map((label) => (
-            <div
-              key={label.muscle}
-              className={`absolute pointer-events-auto group transition-all duration-200 ${
-                isEditing ? 'cursor-move' : 'cursor-pointer'
-              } ${draggedLabel === label.muscle ? 'z-50' : ''} ${
-                selectedLabel === label.muscle ? 'ring-2 ring-primary rounded-md' : ''
-              }`}
-              style={{ 
-                top: label.top,
-                left: label.side === "left" && label.left ? label.left : undefined,
-                right: label.side === "right" && label.right ? label.right : undefined
-              }}
+          {labels.map((label) => {
+            const position = isMobile ? label.position.mobile : label.position.desktop;
+            return (
+              <div
+                key={label.muscle}
+                className={`absolute pointer-events-auto group transition-all duration-200 ${
+                  isEditing ? 'cursor-move' : 'cursor-pointer'
+                } ${draggedLabel === label.muscle ? 'z-50' : ''} ${
+                  selectedLabel === label.muscle ? 'ring-2 ring-primary rounded-md' : ''
+                }`}
+                style={{ 
+                  top: position.top,
+                  left: label.side === "left" ? position.left : undefined,
+                  right: label.side === "right" ? position.right : undefined
+                }}
               onClick={() => {
                 if (isEditing) {
                   setSelectedLabel(label.muscle);
@@ -353,41 +546,42 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
                   handleLabelClick(label.muscle);
                 }
               }}
-              onMouseDown={(e) => handleDragStart(e, label.muscle)}
-              onTouchStart={(e) => handleDragStart(e, label.muscle)}
-            >
-              <div className={`flex items-center ${label.side === "left" ? "flex-row" : "flex-row-reverse"} gap-1`}>
-                {/* Label Text */}
-                <div
-                  className={`font-medium px-2 py-1 whitespace-nowrap ${
-                    label.side === "left" ? "text-left" : "text-right"
-                  } ${
-                    selectedMuscle === label.muscle
-                      ? "font-bold text-primary"
-                      : "text-foreground group-hover:font-semibold group-hover:text-primary"
-                  } transition-all duration-200`}
-                  style={{ fontSize: `${label.fontSize || 14}px` }}
-                >
-                  {label.name}
-                </div>
+                onMouseDown={(e) => handleDragStart(e, label.muscle)}
+                onTouchStart={(e) => handleDragStart(e, label.muscle)}
+              >
+                <div className={`flex items-center ${label.side === "left" ? "flex-row" : "flex-row-reverse"} gap-1`}>
+                  {/* Label Text */}
+                  <div
+                    className={`font-medium px-2 py-1 whitespace-nowrap ${
+                      label.side === "left" ? "text-left" : "text-right"
+                    } ${
+                      selectedMuscle === label.muscle
+                        ? "font-bold text-primary"
+                        : "text-foreground group-hover:font-semibold group-hover:text-primary"
+                    } transition-all duration-200`}
+                    style={{ fontSize: label.fontSize }}
+                  >
+                    {label.name}
+                  </div>
 
-                {/* Line and Point */}
-                <div className="relative flex items-center">
-                  <div
-                    className={`h-[1px] ${
-                      selectedMuscle === label.muscle ? "bg-primary" : "bg-muted-foreground group-hover:bg-primary"
-                    } transition-colors duration-200`}
-                    style={{ width: `${label.lineWidth || 40}px` }}
-                  />
-                  <div
-                    className={`w-2 h-2 rounded-full ${
-                      selectedMuscle === label.muscle ? "bg-primary" : "bg-muted-foreground group-hover:bg-primary"
-                    } transition-colors duration-200`}
-                  />
+                  {/* Line and Point */}
+                  <div className="relative flex items-center">
+                    <div
+                      className={`h-[1px] ${
+                        selectedMuscle === label.muscle ? "bg-primary" : "bg-muted-foreground group-hover:bg-primary"
+                      } transition-colors duration-200`}
+                      style={{ width: `${label.lineLength}px` }}
+                    />
+                    <div
+                      className={`w-2 h-2 rounded-full ${
+                        selectedMuscle === label.muscle ? "bg-primary" : "bg-muted-foreground group-hover:bg-primary"
+                      } transition-colors duration-200`}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
