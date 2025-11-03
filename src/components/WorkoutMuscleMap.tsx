@@ -19,50 +19,50 @@ interface MuscleLabel {
   lineWidth?: number;
 }
 
-// Posições fixas padrão - Desktop
+// Posições ajustadas - Desktop
 const frontLabelsDesktop: MuscleLabel[] = [
-  { name: "Peitoral", muscle: "chest", side: "right", top: "20%", right: "0%", fontSize: 14, lineWidth: 40 },
-  { name: "Ombros", muscle: "shoulders", side: "left", top: "16%", left: "0%", fontSize: 14, lineWidth: 40 },
-  { name: "Bíceps", muscle: "biceps", side: "left", top: "30%", left: "0%", fontSize: 14, lineWidth: 40 },
-  { name: "Abdômen", muscle: "abs", side: "right", top: "36%", right: "0%", fontSize: 14, lineWidth: 40 },
-  { name: "Antebraços", muscle: "forearms", side: "right", top: "48%", right: "0%", fontSize: 14, lineWidth: 40 },
-  { name: "Oblíquos", muscle: "obliques", side: "left", top: "44%", left: "0%", fontSize: 14, lineWidth: 40 },
-  { name: "Quadríceps", muscle: "legs", side: "left", top: "62%", left: "0%", fontSize: 14, lineWidth: 40 },
-  { name: "Adutores", muscle: "adductors", side: "right", top: "62%", right: "0%", fontSize: 14, lineWidth: 40 },
-  { name: "Panturrilhas", muscle: "calves", side: "right", top: "78%", right: "0%", fontSize: 14, lineWidth: 40 },
+  { name: "Peitoral", muscle: "chest", side: "right", top: "23.166666666666668%", right: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Ombros", muscle: "shoulders", side: "left", top: "18.333333333333332%", left: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Bíceps", muscle: "biceps", side: "left", top: "31.666666666666668%", left: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Abdômen", muscle: "abs", side: "right", top: "38.333333333333336%", right: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Antebraços", muscle: "forearms", side: "right", top: "50%", right: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Oblíquos", muscle: "obliques", side: "left", top: "46.666666666666664%", left: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Quadríceps", muscle: "legs", side: "left", top: "65%", left: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Adutores", muscle: "adductors", side: "right", top: "65%", right: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Panturrilhas", muscle: "calves", side: "right", top: "81.66666666666667%", right: "3.125%", fontSize: 14, lineWidth: 40 },
 ];
 
 const backLabelsDesktop: MuscleLabel[] = [
-  { name: "Trapézio", muscle: "traps", side: "right", top: "14%", right: "0%", fontSize: 14, lineWidth: 40 },
-  { name: "Dorsais", muscle: "back", side: "right", top: "28%", right: "0%", fontSize: 14, lineWidth: 40 },
-  { name: "Tríceps", muscle: "triceps", side: "left", top: "28%", left: "0%", fontSize: 14, lineWidth: 40 },
-  { name: "Lombares", muscle: "lower_back", side: "left", top: "42%", left: "0%", fontSize: 14, lineWidth: 40 },
-  { name: "Glúteos", muscle: "glutes", side: "right", top: "48%", right: "0%", fontSize: 14, lineWidth: 40 },
-  { name: "Isquiotibiais", muscle: "hamstrings", side: "left", top: "62%", left: "0%", fontSize: 14, lineWidth: 40 },
-  { name: "Panturrilhas", muscle: "calves", side: "right", top: "76%", right: "0%", fontSize: 14, lineWidth: 40 },
+  { name: "Trapézio", muscle: "traps", side: "right", top: "16.666666666666668%", right: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Dorsais", muscle: "back", side: "right", top: "31.666666666666668%", right: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Tríceps", muscle: "triceps", side: "left", top: "31.666666666666668%", left: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Lombares", muscle: "lower_back", side: "left", top: "45%", left: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Glúteos", muscle: "glutes", side: "right", top: "51.666666666666664%", right: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Isquiotibiais", muscle: "hamstrings", side: "left", top: "65%", left: "3.125%", fontSize: 14, lineWidth: 40 },
+  { name: "Panturrilhas", muscle: "calves", side: "right", top: "80%", right: "3.125%", fontSize: 14, lineWidth: 40 },
 ];
 
-// Posições fixas padrão - Mobile
+// Posições ajustadas - Mobile
 const frontLabelsMobile: MuscleLabel[] = [
-  { name: "Peitoral", muscle: "chest", side: "right", top: "20%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Ombros", muscle: "shoulders", side: "left", top: "16%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Bíceps", muscle: "biceps", side: "left", top: "30%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Abdômen", muscle: "abs", side: "right", top: "36%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Antebraços", muscle: "forearms", side: "right", top: "48%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Oblíquos", muscle: "obliques", side: "left", top: "44%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Quadríceps", muscle: "legs", side: "left", top: "62%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Adutores", muscle: "adductors", side: "right", top: "62%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Panturrilhas", muscle: "calves", side: "right", top: "78%", right: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Peitoral", muscle: "chest", side: "right", top: "23.166666666666668%", right: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Ombros", muscle: "shoulders", side: "left", top: "18.333333333333332%", left: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Bíceps", muscle: "biceps", side: "left", top: "31.666666666666668%", left: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Abdômen", muscle: "abs", side: "right", top: "38.333333333333336%", right: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Antebraços", muscle: "forearms", side: "right", top: "50%", right: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Oblíquos", muscle: "obliques", side: "left", top: "46.666666666666664%", left: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Quadríceps", muscle: "legs", side: "left", top: "65%", left: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Adutores", muscle: "adductors", side: "right", top: "65%", right: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Panturrilhas", muscle: "calves", side: "right", top: "81.66666666666667%", right: "0%", fontSize: 12, lineWidth: 35 },
 ];
 
 const backLabelsMobile: MuscleLabel[] = [
-  { name: "Trapézio", muscle: "traps", side: "right", top: "14%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Dorsais", muscle: "back", side: "right", top: "28%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Tríceps", muscle: "triceps", side: "left", top: "28%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Lombares", muscle: "lower_back", side: "left", top: "42%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Glúteos", muscle: "glutes", side: "right", top: "48%", right: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Isquiotibiais", muscle: "hamstrings", side: "left", top: "62%", left: "0%", fontSize: 12, lineWidth: 35 },
-  { name: "Panturrilhas", muscle: "calves", side: "right", top: "76%", right: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Trapézio", muscle: "traps", side: "right", top: "16.666666666666668%", right: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Dorsais", muscle: "back", side: "right", top: "31.666666666666668%", right: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Tríceps", muscle: "triceps", side: "left", top: "31.666666666666668%", left: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Lombares", muscle: "lower_back", side: "left", top: "45%", left: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Glúteos", muscle: "glutes", side: "right", top: "51.666666666666664%", right: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Isquiotibiais", muscle: "hamstrings", side: "left", top: "65%", left: "0%", fontSize: 12, lineWidth: 35 },
+  { name: "Panturrilhas", muscle: "calves", side: "right", top: "80%", right: "0%", fontSize: 12, lineWidth: 35 },
 ];
 
 export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: WorkoutMuscleMapProps) {
