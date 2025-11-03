@@ -263,6 +263,7 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
   const [draggedLabel, setDraggedLabel] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
+  const [editMenuPosition, setEditMenuPosition] = useState<{ top: number; left: number } | null>(null);
   
   // Atualiza labels quando view ou dispositivo muda
   useState(() => {
@@ -451,159 +452,30 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
             if (!isEditing) {
               setEditableLabels(baseLabels);
               setSelectedLabel(null);
+              setEditMenuPosition(null);
             } else {
               setSelectedLabel(null);
+              setEditMenuPosition(null);
             }
           }}
           variant={isEditing ? "destructive" : "default"}
         >
-          {isEditing ? "Cancelar Edição" : "Ativar Modo Editor"}
+          {isEditing ? "Sair do Editor" : "Modo Editor"}
         </Button>
         {isEditing && (
           <>
             <Button onClick={handleSavePositions} variant="default">
-              Salvar Posições
+              Salvar
             </Button>
             <Button onClick={handleResetPositions} variant="outline">
               Resetar
             </Button>
+            <Button onClick={handleAddLabel} variant="outline">
+              + Label
+            </Button>
           </>
         )}
       </div>
-      
-      {/* Painel de Edição Avançado */}
-      {isEditing && (
-        <Card className="w-full max-w-[600px] z-30">
-          <CardContent className="pt-6 space-y-4">
-            <div className="flex gap-2">
-              <Button onClick={handleAddLabel} variant="default" className="flex-1">
-                Adicionar Label
-              </Button>
-              {selectedLabel && (
-                <Button onClick={handleRemoveLabel} variant="destructive" className="flex-1">
-                  Remover Label
-                </Button>
-              )}
-            </div>
-            
-            <div>
-              <label className="text-sm font-medium mb-2 block">Selecionar Músculo:</label>
-              <Select value={selectedLabel || ""} onValueChange={setSelectedLabel}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Escolha um músculo para editar" />
-                </SelectTrigger>
-                <SelectContent>
-                  {labels.map(label => (
-                    <SelectItem key={label.muscle} value={label.muscle}>
-                      {label.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            {selectedLabelData && (
-              <>
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Nome do Label:</label>
-                  <input
-                    type="text"
-                    value={selectedLabelData.name}
-                    onChange={(e) => handleNameChange(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-md"
-                  />
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Tamanho da Fonte: {selectedLabelData.fontSize}
-                  </label>
-                  <Slider
-                    value={[parseInt(selectedLabelData.fontSize)]}
-                    onValueChange={handleFontSizeChange}
-                    min={8}
-                    max={24}
-                    step={1}
-                  />
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Comprimento da Linha: {selectedLabelData.lineLength}px
-                  </label>
-                  <Slider
-                    value={[selectedLabelData.lineLength]}
-                    onValueChange={handleLineWidthChange}
-                    min={20}
-                    max={120}
-                    step={5}
-                  />
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Lado:</label>
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => handleSideChange("left")}
-                      variant={selectedLabelData.side === "left" ? "default" : "outline"}
-                      className="flex-1"
-                    >
-                      Esquerda
-                    </Button>
-                    <Button
-                      onClick={() => handleSideChange("right")}
-                      variant={selectedLabelData.side === "right" ? "default" : "outline"}
-                      className="flex-1"
-                    >
-                      Direita
-                    </Button>
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Tipo de Linha:</label>
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => handleLineTypeChange("straight")}
-                      variant={selectedLabelData.lineType === "straight" ? "default" : "outline"}
-                      className="flex-1"
-                    >
-                      Reta
-                    </Button>
-                    <Button
-                      onClick={() => handleLineTypeChange("curved")}
-                      variant={selectedLabelData.lineType === "curved" ? "default" : "outline"}
-                      className="flex-1"
-                    >
-                      Curva
-                    </Button>
-                  </div>
-                </div>
-                
-                <div>
-                  <Button
-                    onClick={handleToggleLineAndPoint}
-                    variant={selectedLabelData.hideLineAndPoint ? "default" : "outline"}
-                    className="w-full"
-                  >
-                    {selectedLabelData.hideLineAndPoint ? "Mostrar Linha e Ponto" : "Ocultar Linha e Ponto"}
-                  </Button>
-                </div>
-                
-                <div className="text-xs text-muted-foreground space-y-1">
-                  <p>Dispositivo: {isMobile ? 'Mobile' : 'Desktop'}</p>
-                  <p>Posição: {isMobile ? selectedLabelData.position.mobile.top : selectedLabelData.position.desktop.top}</p>
-                  <p>
-                    {selectedLabelData.side === "left" 
-                      ? `left: ${isMobile ? selectedLabelData.position.mobile.left : selectedLabelData.position.desktop.left}` 
-                      : `right: ${isMobile ? selectedLabelData.position.mobile.right : selectedLabelData.position.desktop.right}`}
-                  </p>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      )}
       
       <div 
         className="relative w-full max-w-[600px] flex items-center justify-center muscle-map-container"
@@ -640,9 +512,14 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
                   left: label.side === "left" ? position.left : undefined,
                   right: label.side === "right" ? position.right : undefined
                 }}
-              onClick={() => {
+              onClick={(e) => {
                 if (isEditing) {
+                  const rect = e.currentTarget.getBoundingClientRect();
                   setSelectedLabel(label.muscle);
+                  setEditMenuPosition({
+                    top: rect.top + window.scrollY,
+                    left: label.side === "left" ? rect.right + 10 : rect.left - 260
+                  });
                 } else {
                   handleLabelClick(label.muscle);
                 }
@@ -687,6 +564,123 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
           })}
         </div>
       </div>
+
+      {/* Menu de Edição Inline */}
+      {isEditing && selectedLabel && editMenuPosition && selectedLabelData && (
+        <Card 
+          className="fixed z-50 w-[250px] shadow-lg"
+          style={{
+            top: `${editMenuPosition.top}px`,
+            left: `${editMenuPosition.left}px`,
+          }}
+        >
+          <CardContent className="p-3 space-y-3">
+            <div className="flex items-center justify-between border-b pb-2">
+              <span className="font-medium text-sm">{selectedLabelData.name}</span>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                onClick={() => {
+                  setSelectedLabel(null);
+                  setEditMenuPosition(null);
+                }}
+              >
+                ✕
+              </Button>
+            </div>
+
+            <div>
+              <label className="text-xs font-medium">Nome</label>
+              <input
+                type="text"
+                value={selectedLabelData.name}
+                onChange={(e) => handleNameChange(e.target.value)}
+                className="w-full px-2 py-1 text-sm border rounded mt-1"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium">Fonte: {selectedLabelData.fontSize}</label>
+              <Slider
+                value={[parseInt(selectedLabelData.fontSize)]}
+                onValueChange={handleFontSizeChange}
+                min={8}
+                max={24}
+                step={1}
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium">Linha: {selectedLabelData.lineLength}px</label>
+              <Slider
+                value={[selectedLabelData.lineLength]}
+                onValueChange={handleLineWidthChange}
+                min={20}
+                max={120}
+                step={5}
+                className="mt-1"
+              />
+            </div>
+
+            <div className="flex gap-1">
+              <Button
+                size="sm"
+                onClick={() => handleSideChange("left")}
+                variant={selectedLabelData.side === "left" ? "default" : "outline"}
+                className="flex-1 text-xs"
+              >
+                Esq
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => handleSideChange("right")}
+                variant={selectedLabelData.side === "right" ? "default" : "outline"}
+                className="flex-1 text-xs"
+              >
+                Dir
+              </Button>
+            </div>
+
+            <div className="flex gap-1">
+              <Button
+                size="sm"
+                onClick={() => handleLineTypeChange("straight")}
+                variant={selectedLabelData.lineType === "straight" ? "default" : "outline"}
+                className="flex-1 text-xs"
+              >
+                Reta
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => handleLineTypeChange("curved")}
+                variant={selectedLabelData.lineType === "curved" ? "default" : "outline"}
+                className="flex-1 text-xs"
+              >
+                Curva
+              </Button>
+            </div>
+
+            <Button
+              size="sm"
+              onClick={handleToggleLineAndPoint}
+              variant="outline"
+              className="w-full text-xs"
+            >
+              {selectedLabelData.hideLineAndPoint ? "Mostrar Linha" : "Ocultar Linha"}
+            </Button>
+
+            <Button
+              size="sm"
+              onClick={handleRemoveLabel}
+              variant="destructive"
+              className="w-full text-xs"
+            >
+              Remover Label
+            </Button>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
