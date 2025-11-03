@@ -1,12 +1,18 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { Settings, Save, Edit2, ArrowLeftRight, Plus, Minus, X, PlusCircle, GitBranch, Type, Slash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Card } from "@/components/ui/card";
+import { toast } from "sonner";
 import bodyFrontWorkout from "@/assets/body-front-workout-transparent.png";
 import bodyBackWorkout from "@/assets/body-back-workout-transparent.png";
-import { toast } from "sonner";
+import { ExerciseList } from "@/components/ExerciseList";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface WorkoutMuscleMapProps {
   view: "front" | "back";
@@ -17,475 +23,339 @@ interface WorkoutMuscleMapProps {
 interface MuscleLabel {
   name: string;
   muscle: string;
-  position: {
-    desktop: { top: string; left?: string; right?: string };
-    mobile: { top: string; left?: string; right?: string };
-  };
   side: "left" | "right";
-  lineLength: number;
-  fontSize: string;
-  lineType: 'straight' | 'curved';
-  hideLineAndPoint?: boolean;
+  top: string;
+  left?: string;
+  right?: string;
+  fontSize?: number;
+  lineWidth?: number;
+  pointSide?: "left" | "right";
+  lineType?: "straight" | "angled";
+  hideLabel?: boolean;
+  hideLine?: boolean;
 }
 
 const frontLabels: MuscleLabel[] = [
-  {
-    name: "Ombros",
-    muscle: "ombros",
-    side: "left",
-    position: {
-      desktop: { top: "18%", left: "10%" },
-      mobile: { top: "18%", left: "5%" }
-    },
-    lineLength: 60,
-    fontSize: "14px",
-    lineType: 'straight'
-  },
-  {
-    name: "Bíceps",
-    muscle: "biceps",
-    side: "left",
-    position: {
-      desktop: { top: "32%", left: "8%" },
-      mobile: { top: "32%", left: "3%" }
-    },
-    lineLength: 70,
-    fontSize: "14px",
-    lineType: 'straight'
-  },
-  {
-    name: "Oblíquos",
-    muscle: "obliquos",
-    side: "left",
-    position: {
-      desktop: { top: "46%", left: "5%" },
-      mobile: { top: "46%", left: "2%" }
-    },
-    lineLength: 80,
-    fontSize: "14px",
-    lineType: 'straight'
-  },
-  {
-    name: "Abdutores",
-    muscle: "abdutores",
-    side: "left",
-    position: {
-      desktop: { top: "60%", left: "3%" },
-      mobile: { top: "60%", left: "1%" }
-    },
-    lineLength: 90,
-    fontSize: "14px",
-    lineType: 'straight'
-  },
-  {
-    name: "Quadríceps",
-    muscle: "quadriceps",
-    side: "left",
-    position: {
-      desktop: { top: "74%", left: "2%" },
-      mobile: { top: "74%", left: "0%" }
-    },
-    lineLength: 95,
-    fontSize: "14px",
-    lineType: 'straight'
-  },
-  {
-    name: "Peitoral",
-    muscle: "peitoral",
-    side: "right",
-    position: {
-      desktop: { top: "22%", right: "10%" },
-      mobile: { top: "22%", right: "5%" }
-    },
-    lineLength: 60,
-    fontSize: "14px",
-    lineType: 'straight'
-  },
-  {
-    name: "Abdômen",
-    muscle: "abdomen",
-    side: "right",
-    position: {
-      desktop: { top: "38%", right: "8%" },
-      mobile: { top: "38%", right: "3%" }
-    },
-    lineLength: 70,
-    fontSize: "14px",
-    lineType: 'straight'
-  },
-  {
-    name: "Antebraços",
-    muscle: "antebracos",
-    side: "right",
-    position: {
-      desktop: { top: "52%", right: "5%" },
-      mobile: { top: "52%", right: "2%" }
-    },
-    lineLength: 80,
-    fontSize: "14px",
-    lineType: 'straight'
-  },
-  {
-    name: "Adutores",
-    muscle: "adutores",
-    side: "right",
-    position: {
-      desktop: { top: "66%", right: "3%" },
-      mobile: { top: "66%", right: "1%" }
-    },
-    lineLength: 90,
-    fontSize: "14px",
-    lineType: 'straight'
-  },
-  {
-    name: "Cardio",
-    muscle: "cardio",
-    side: "right",
-    position: {
-      desktop: { top: "80%", right: "2%" },
-      mobile: { top: "80%", right: "0%" }
-    },
-    lineLength: 95,
-    fontSize: "14px",
-    lineType: 'straight'
-  }
+  { name: "Peitoral", muscle: "chest", side: "right", top: "20%" },
+  { name: "Ombros", muscle: "shoulders", side: "left", top: "16%" },
+  { name: "Bíceps", muscle: "biceps", side: "left", top: "30%" },
+  { name: "Abdômen", muscle: "abs", side: "right", top: "36%" },
+  { name: "Antebraços", muscle: "forearms", side: "right", top: "48%" },
+  { name: "Oblíquos", muscle: "obliques", side: "left", top: "44%" },
+  { name: "Quadríceps", muscle: "legs", side: "left", top: "62%" },
+  { name: "Adutores", muscle: "adductors", side: "right", top: "62%" },
+  { name: "Panturrilhas", muscle: "calves", side: "right", top: "78%" },
 ];
 
 const backLabels: MuscleLabel[] = [
-  {
-    name: "Trapézio",
-    muscle: "trapezio",
-    side: "right",
-    position: {
-      desktop: { top: "16%", right: "10%" },
-      mobile: { top: "16%", right: "5%" }
-    },
-    lineLength: 60,
-    fontSize: "14px",
-    lineType: 'straight'
-  },
-  {
-    name: "Tríceps",
-    muscle: "triceps",
-    side: "left",
-    position: {
-      desktop: { top: "30%", left: "8%" },
-      mobile: { top: "30%", left: "3%" }
-    },
-    lineLength: 70,
-    fontSize: "14px",
-    lineType: 'straight'
-  },
-  {
-    name: "Dorsais",
-    muscle: "dorsais",
-    side: "right",
-    position: {
-      desktop: { top: "32%", right: "8%" },
-      mobile: { top: "32%", right: "3%" }
-    },
-    lineLength: 70,
-    fontSize: "14px",
-    lineType: 'straight'
-  },
-  {
-    name: "Lombares",
-    muscle: "lombares",
-    side: "left",
-    position: {
-      desktop: { top: "46%", left: "5%" },
-      mobile: { top: "46%", left: "2%" }
-    },
-    lineLength: 80,
-    fontSize: "14px",
-    lineType: 'straight'
-  },
-  {
-    name: "Glúteos",
-    muscle: "gluteos",
-    side: "right",
-    position: {
-      desktop: { top: "52%", right: "5%" },
-      mobile: { top: "52%", right: "2%" }
-    },
-    lineLength: 80,
-    fontSize: "14px",
-    lineType: 'straight'
-  },
-  {
-    name: "Isquiotibiais",
-    muscle: "isquiotibiais",
-    side: "left",
-    position: {
-      desktop: { top: "66%", left: "3%" },
-      mobile: { top: "66%", left: "1%" }
-    },
-    lineLength: 90,
-    fontSize: "14px",
-    lineType: 'straight'
-  },
-  {
-    name: "Cardio",
-    muscle: "cardio",
-    side: "right",
-    position: {
-      desktop: { top: "70%", right: "3%" },
-      mobile: { top: "70%", right: "1%" }
-    },
-    lineLength: 90,
-    fontSize: "14px",
-    lineType: 'straight'
-  },
-  {
-    name: "Panturrilhas",
-    muscle: "panturrilhas",
-    side: "left",
-    position: {
-      desktop: { top: "84%", left: "2%" },
-      mobile: { top: "84%", left: "0%" }
-    },
-    lineLength: 95,
-    fontSize: "14px",
-    lineType: 'straight'
-  }
+  { name: "Trapézio", muscle: "traps", side: "right", top: "14%" },
+  { name: "Dorsais", muscle: "back", side: "right", top: "28%" },
+  { name: "Tríceps", muscle: "triceps", side: "left", top: "28%" },
+  { name: "Lombares", muscle: "lower_back", side: "left", top: "42%" },
+  { name: "Glúteos", muscle: "glutes", side: "right", top: "48%" },
+  { name: "Isquiotibiais", muscle: "hamstrings", side: "left", top: "62%" },
+  { name: "Panturrilhas", muscle: "calves", side: "right", top: "76%" },
 ];
 
 export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: WorkoutMuscleMapProps) {
   const navigate = useNavigate();
-  const isMobile = window.innerWidth < 768;
-  
-  // Seleciona os labels corretos baseado na view
-  const baseLabels = view === "front" ? frontLabels : backLabels;
-  
-  // Estados para modo editor
+  const isMobile = useIsMobile();
+  // Chaves separadas para mobile e desktop
+  const storageKey = `muscle-labels-${view}-${isMobile ? 'mobile' : 'desktop'}`;
+  const [labels, setLabels] = useState<MuscleLabel[]>(() => {
+    const saved = localStorage.getItem(storageKey);
+    return saved ? JSON.parse(saved) : (view === "front" ? frontLabels : backLabels);
+  });
   const [isEditing, setIsEditing] = useState(false);
-  const [editableLabels, setEditableLabels] = useState<MuscleLabel[]>(baseLabels);
+  const [labelSize, setLabelSize] = useState(14);
+  const [lineWidth, setLineWidth] = useState(40);
   const [draggedLabel, setDraggedLabel] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
-  const [editMenuPosition, setEditMenuPosition] = useState<{ top: number; left: number } | null>(null);
-  
-  // Atualiza labels quando view ou dispositivo muda
-  useState(() => {
-    setEditableLabels(baseLabels);
-  });
-  
-  const labels = isEditing ? editableLabels : baseLabels;
+  const [showExercises, setShowExercises] = useState(false);
+  const [selectedMuscleForExercises, setSelectedMuscleForExercises] = useState<string | null>(null);
+  const [editingLabel, setEditingLabel] = useState<string | null>(null);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [newLabelData, setNewLabelData] = useState({ name: "", muscle: "", side: "left" as "left" | "right" });
 
-  const handleLabelClick = (muscle: string) => {
-    if (isEditing) return; // Não navega no modo edição
-    const label = labels.find(l => l.muscle === muscle);
-    const muscleName = label ? label.name.toLowerCase() : muscle;
-    navigate(`/workouts/muscle/${muscleName}`);
+  useEffect(() => {
+    const saved = localStorage.getItem(storageKey);
+    setLabels(saved ? JSON.parse(saved) : (view === "front" ? frontLabels : backLabels));
+  }, [view, storageKey]);
+
+  const handleSavePositions = () => {
+    localStorage.setItem(storageKey, JSON.stringify(labels));
+    toast.success("Posições salvas com sucesso!");
   };
-  
-  const handleDragStart = (e: React.MouseEvent | React.TouchEvent, muscle: string) => {
+
+  const handleResetPositions = () => {
+    const defaultLabels = view === "front" ? frontLabels : backLabels;
+    setLabels(defaultLabels);
+    localStorage.removeItem(storageKey);
+    toast.success("Posições resetadas!");
+  };
+
+  const handleFlipSide = (muscle: string) => {
+    setLabels(prev => prev.map(label => 
+      label.muscle === muscle 
+        ? { ...label, side: label.side === "left" ? "right" : "left" }
+        : label
+    ));
+  };
+
+  const handleFlipPointSide = (muscle: string) => {
+    setLabels(prev => prev.map(label => {
+      if (label.muscle === muscle) {
+        const currentPointSide = label.pointSide || label.side;
+        return { ...label, pointSide: currentPointSide === "left" ? "right" : "left" };
+      }
+      return label;
+    }));
+  };
+
+  const handleToggleLineType = (muscle: string) => {
+    setLabels(prev => prev.map(label => 
+      label.muscle === muscle 
+        ? { ...label, lineType: label.lineType === "angled" ? "straight" : "angled" }
+        : label
+    ));
+  };
+
+  const handleToggleLabel = (muscle: string) => {
+    setLabels(prev => prev.map(label => 
+      label.muscle === muscle 
+        ? { ...label, hideLabel: !label.hideLabel }
+        : label
+    ));
+  };
+
+  const handleToggleLine = (muscle: string) => {
+    setLabels(prev => prev.map(label => 
+      label.muscle === muscle 
+        ? { ...label, hideLine: !label.hideLine }
+        : label
+    ));
+  };
+
+  const handleDragStart = (e: React.MouseEvent, muscle: string) => {
     if (!isEditing) return;
     e.preventDefault();
-    
-    const container = (e.currentTarget as HTMLElement).closest('.muscle-map-container');
-    if (!container) return;
-    
-    const rect = container.getBoundingClientRect();
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    setDraggedLabel(muscle);
     
     const label = labels.find(l => l.muscle === muscle);
     if (!label) return;
-    
-    const labelElement = e.currentTarget as HTMLElement;
-    const labelRect = labelElement.getBoundingClientRect();
-    
-    setDraggedLabel(muscle);
+
+    const rect = e.currentTarget.getBoundingClientRect();
     setDragOffset({
-      x: clientX - labelRect.left,
-      y: clientY - labelRect.top
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
     });
   };
-  
-  const handleDragMove = (e: React.MouseEvent | React.TouchEvent) => {
+
+  const handleDragMove = (e: React.MouseEvent) => {
     if (!isEditing || !draggedLabel) return;
-    e.preventDefault();
     
-    const container = (e.currentTarget as HTMLElement);
-    const rect = container.getBoundingClientRect();
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    
-    const x = clientX - rect.left - dragOffset.x;
-    const y = clientY - rect.top - dragOffset.y;
-    
-    const percentX = (x / rect.width) * 100;
-    const percentY = (y / rect.height) * 100;
-    
-    const deviceKey = isMobile ? 'mobile' : 'desktop';
-    
-    setEditableLabels(prev => prev.map(label => {
-      if (label.muscle === draggedLabel) {
-        return {
-          ...label,
-          position: {
-            ...label.position,
-            [deviceKey]: {
-              top: `${percentY}%`,
-              left: label.side === "left" ? `${percentX}%` : undefined,
-              right: label.side === "right" ? `${100 - percentX}%` : undefined,
-            }
+    const container = document.getElementById('muscle-map-container');
+    if (!container) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const topPercent = ((e.clientY - containerRect.top - dragOffset.y) / containerRect.height) * 100;
+    const leftPercent = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+
+    setLabels(prev => prev.map(label => 
+      label.muscle === draggedLabel
+        ? { 
+            ...label, 
+            top: `${Math.max(0, Math.min(100, topPercent))}%`,
+            ...(label.side === "left" 
+              ? { left: `${Math.max(0, Math.min(50, leftPercent))}%` }
+              : { right: `${Math.max(0, Math.min(50, 100 - leftPercent))}%` }
+            )
           }
-        };
-      }
-      return label;
-    }));
+        : label
+    ));
   };
-  
+
   const handleDragEnd = () => {
     setDraggedLabel(null);
   };
-  
-  const handleSavePositions = () => {
-    const device = isMobile ? "Mobile" : "Desktop";
-    const viewType = view === "front" ? "front" : "back";
-    console.log(`${viewType}Labels${device}:`, editableLabels);
-    toast.success("Posições salvas com sucesso!");
+
+  const handleLabelClick = (muscle: string) => {
+    if (isEditing) return;
+    
+    // Encontrar o label correspondente
+    const label = labels.find(l => l.muscle === muscle);
+    const muscleName = label ? label.name.toLowerCase() : muscle;
+    
+    // Navegar para a página de treino do músculo
+    navigate(`/workouts/muscle/${muscleName}`);
   };
-  
-  const handleResetPositions = () => {
-    setEditableLabels(baseLabels);
-    setSelectedLabel(null);
-    toast.success("Posições resetadas!");
+
+  const getMuscleName = (muscle: string) => {
+    const label = labels.find(l => l.muscle === muscle);
+    return label ? label.name : muscle;
   };
-  
-  const handleFontSizeChange = (value: number[]) => {
-    if (!selectedLabel) return;
-    setEditableLabels(prev => prev.map(label => 
-      label.muscle === selectedLabel ? { ...label, fontSize: `${value[0]}px` } : label
+
+  const handleIncreaseFontSize = (muscle: string) => {
+    setLabels(prev => prev.map(label => 
+      label.muscle === muscle 
+        ? { ...label, fontSize: (label.fontSize || labelSize) + 1 }
+        : label
     ));
   };
-  
-  const handleLineWidthChange = (value: number[]) => {
-    if (!selectedLabel) return;
-    setEditableLabels(prev => prev.map(label => 
-      label.muscle === selectedLabel ? { ...label, lineLength: value[0] } : label
+
+  const handleDecreaseFontSize = (muscle: string) => {
+    setLabels(prev => prev.map(label => 
+      label.muscle === muscle 
+        ? { ...label, fontSize: Math.max(10, (label.fontSize || labelSize) - 1) }
+        : label
     ));
   };
-  
-  const handleSideChange = (side: "left" | "right") => {
-    if (!selectedLabel) return;
-    const deviceKey = isMobile ? 'mobile' : 'desktop';
-    setEditableLabels(prev => prev.map(label => {
-      if (label.muscle === selectedLabel) {
-        return {
-          ...label,
-          side,
-          position: {
-            ...label.position,
-            [deviceKey]: {
-              ...label.position[deviceKey],
-              left: side === "left" ? "3.125%" : undefined,
-              right: side === "right" ? "3.125%" : undefined,
-            }
-          }
-        };
-      }
-      return label;
-    }));
-  };
-  
-  const handleLineTypeChange = (lineType: "straight" | "curved") => {
-    if (!selectedLabel) return;
-    setEditableLabels(prev => prev.map(label => 
-      label.muscle === selectedLabel ? { ...label, lineType } : label
+
+  const handleIncreaseLineWidth = (muscle: string) => {
+    setLabels(prev => prev.map(label => 
+      label.muscle === muscle 
+        ? { ...label, lineWidth: (label.lineWidth || lineWidth) + 5 }
+        : label
     ));
   };
-  
-  const handleToggleLineAndPoint = () => {
-    if (!selectedLabel) return;
-    setEditableLabels(prev => prev.map(label => 
-      label.muscle === selectedLabel ? { ...label, hideLineAndPoint: !label.hideLineAndPoint } : label
+
+  const handleDecreaseLineWidth = (muscle: string) => {
+    setLabels(prev => prev.map(label => 
+      label.muscle === muscle 
+        ? { ...label, lineWidth: Math.max(20, (label.lineWidth || lineWidth) - 5) }
+        : label
     ));
   };
-  
+
+  const handleToggleLabelEdit = (muscle: string, e: React.MouseEvent) => {
+    if (!isEditing) return;
+    e.stopPropagation();
+    setEditingLabel(editingLabel === muscle ? null : muscle);
+  };
+
   const handleAddLabel = () => {
-    const newMuscle = `novo_musculo_${Date.now()}`;
-    const deviceKey = isMobile ? 'mobile' : 'desktop';
+    if (!newLabelData.name.trim() || !newLabelData.muscle.trim()) {
+      toast.error("Preencha nome e identificador do músculo");
+      return;
+    }
+
     const newLabel: MuscleLabel = {
-      name: "Novo Músculo",
-      muscle: newMuscle,
-      side: "left",
-      position: {
-        desktop: { top: "50%", left: "10%" },
-        mobile: { top: "50%", left: "5%" }
-      },
-      lineLength: 60,
-      fontSize: "14px",
-      lineType: 'straight',
-      hideLineAndPoint: false
+      name: newLabelData.name,
+      muscle: newLabelData.muscle.toLowerCase().replace(/\s+/g, '_'),
+      side: newLabelData.side,
+      top: "50%",
+      fontSize: labelSize,
+      lineWidth: lineWidth
     };
-    setEditableLabels(prev => [...prev, newLabel]);
-    setSelectedLabel(newMuscle);
-    toast.success("Novo label adicionado!");
+
+    setLabels(prev => [...prev, newLabel]);
+    setNewLabelData({ name: "", muscle: "", side: "left" });
+    setShowAddDialog(false);
+    toast.success("Label adicionado! Não esqueça de salvar as posições.");
   };
-  
-  const handleRemoveLabel = () => {
-    if (!selectedLabel) return;
-    setEditableLabels(prev => prev.filter(label => label.muscle !== selectedLabel));
-    toast.success("Label removido!");
-    setSelectedLabel(null);
+
+  const handleRemoveLabel = (muscle: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setLabels(prev => prev.filter(label => label.muscle !== muscle));
+    setEditingLabel(null);
+    toast.success("Label removido! Não esqueça de salvar as posições.");
   };
-  
-  const handleNameChange = (newName: string) => {
-    if (!selectedLabel) return;
-    setEditableLabels(prev => prev.map(label => 
-      label.muscle === selectedLabel ? { ...label, name: newName } : label
-    ));
-  };
-  
-  const selectedLabelData = editableLabels.find(l => l.muscle === selectedLabel);
 
   return (
-    <div className="relative w-full flex flex-col items-center justify-center py-4 gap-4">
-      {/* Controles do Editor */}
-      <div className="flex flex-wrap gap-2 z-30 justify-center">
-        <Button
-          onClick={() => {
-            setIsEditing(!isEditing);
-            if (!isEditing) {
-              setEditableLabels(baseLabels);
-              setSelectedLabel(null);
-              setEditMenuPosition(null);
-            } else {
-              setSelectedLabel(null);
-              setEditMenuPosition(null);
-            }
-          }}
-          variant={isEditing ? "destructive" : "default"}
-        >
-          {isEditing ? "Sair do Editor" : "Modo Editor"}
-        </Button>
-        {isEditing && (
-          <>
-            <Button onClick={handleSavePositions} variant="default">
-              Salvar
-            </Button>
-            <Button onClick={handleResetPositions} variant="outline">
-              Resetar
-            </Button>
-            <Button onClick={handleAddLabel} variant="outline">
-              + Label
-            </Button>
-          </>
-        )}
-      </div>
-      
-      <div 
-        className="relative w-full max-w-[600px] flex items-center justify-center muscle-map-container"
+    <div className="relative w-full flex flex-col items-center justify-center py-0 gap-2">
+      {/* Edit Controls - Apenas Desktop */}
+      {!isMobile && (
+        <>
+          <div className="flex gap-2 flex-wrap justify-center">
+              <Button 
+                variant={isEditing ? "default" : "outline"} 
+                size="default"
+                className={`gap-2 ${isEditing ? 'animate-pulse' : ''}`}
+                onClick={() => setIsEditing(!isEditing)}
+              >
+                <Edit2 className="w-4 h-4" />
+                {isEditing ? "Modo Editor Ativo" : "🎨 Ativar Modo Editor"}
+              </Button>
+
+              {isEditing && (
+                <>
+                  <Button variant="outline" size="default" className="gap-2" onClick={handleSavePositions}>
+                    <Save className="w-4 h-4" />
+                    Salvar Posições
+                  </Button>
+                  <Button variant="outline" size="default" onClick={handleResetPositions}>
+                    Resetar
+                  </Button>
+                  <Button variant="outline" size="default" className="gap-2" onClick={() => setShowAddDialog(true)}>
+                    <PlusCircle className="w-4 h-4" />
+                    Adicionar Label
+                  </Button>
+                </>
+              )}
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="default" className="gap-2">
+                    <Settings className="w-4 h-4" />
+                    Ajustes Globais
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="label-size">Tamanho do Texto Padrão: {labelSize}px</Label>
+                      <Slider
+                        id="label-size"
+                        min={10}
+                        max={24}
+                        step={1}
+                        value={[labelSize]}
+                        onValueChange={(value) => setLabelSize(value[0])}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="line-width">Largura da Linha Padrão: {lineWidth}px</Label>
+                      <Slider
+                        id="line-width"
+                        min={20}
+                        max={100}
+                        step={5}
+                        value={[lineWidth]}
+                        onValueChange={(value) => setLineWidth(value[0])}
+                      />
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {isEditing && (
+              <Card className="bg-primary/5 border-primary/20 p-4 max-w-2xl">
+                <div className="text-sm space-y-2">
+                  <p className="font-semibold text-primary flex items-center gap-2">
+                    <Edit2 className="w-4 h-4" />
+                    Como usar o Modo Editor:
+                  </p>
+                  <ul className="space-y-1 text-muted-foreground ml-4">
+                    <li>• <strong>Arrastar:</strong> Clique e segure em qualquer label para mover livremente em todas as direções</li>
+                    <li>• <strong>Editar Texto:</strong> Clique no label para abrir controles e ajustar tamanho do texto (+ / -)</li>
+                    <li>• <strong>Editar Linha:</strong> Use os controles do label para ajustar tamanho da linha conectora (+ / -)</li>
+                    <li>• <strong>Salvar:</strong> Não esqueça de clicar em "Salvar Posições" quando terminar</li>
+                  </ul>
+                </div>
+              </Card>
+            )}
+        </>
+      )}
+
+      <div
+        id="muscle-map-container"
+        className="relative w-full max-w-[600px] flex items-center justify-center"
         onMouseMove={handleDragMove}
         onMouseUp={handleDragEnd}
         onMouseLeave={handleDragEnd}
-        onTouchMove={handleDragMove}
-        onTouchEnd={handleDragEnd}
       >
-        {/* Body Image */}
+        {/* Body Image - transparent background adapts to theme */}
         <div className="relative flex items-center justify-center transition-all duration-300 ease-in-out">
           <img
             src={view === "front" ? bodyFrontWorkout : bodyBackWorkout}
@@ -497,38 +367,24 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
 
         {/* Muscle Labels */}
         <div className="absolute inset-0 pointer-events-none z-20">
-          {labels.map((label) => {
-            const position = isMobile ? label.position.mobile : label.position.desktop;
-            return (
-              <div
-                key={label.muscle}
-                className={`absolute pointer-events-auto group transition-all duration-200 ${
-                  isEditing ? 'cursor-move' : 'cursor-pointer'
-                } ${draggedLabel === label.muscle ? 'z-50' : ''} ${
-                  selectedLabel === label.muscle ? 'ring-2 ring-primary rounded-md' : ''
-                }`}
-                style={{ 
-                  top: position.top,
-                  left: label.side === "left" ? position.left : undefined,
-                  right: label.side === "right" ? position.right : undefined
-                }}
-              onClick={(e) => {
-                if (isEditing) {
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  setSelectedLabel(label.muscle);
-                  setEditMenuPosition({
-                    top: rect.top + window.scrollY,
-                    left: label.side === "left" ? rect.right + 10 : rect.left - 260
-                  });
-                } else {
-                  handleLabelClick(label.muscle);
-                }
+          {labels.map((label) => (
+            <div
+              key={label.muscle}
+              className={`absolute pointer-events-auto ${
+                !label.left && !label.right ? (label.side === "left" ? "left-0" : "right-0") : ""
+              } ${isEditing ? "cursor-move hover:scale-105" : "cursor-pointer"} group ${
+                draggedLabel === label.muscle ? "z-50 opacity-80 scale-110" : ""
+              } ${editingLabel === label.muscle ? "z-50" : ""} transition-all duration-200`}
+              style={{ 
+                top: label.top,
+                left: label.side === "left" && label.left ? label.left : undefined,
+                right: label.side === "right" && label.right ? label.right : undefined
               }}
-                onMouseDown={(e) => handleDragStart(e, label.muscle)}
-                onTouchStart={(e) => handleDragStart(e, label.muscle)}
-              >
+              onClick={(e) => (isEditing && !isMobile) ? handleToggleLabelEdit(label.muscle, e) : handleLabelClick(label.muscle)}
+              onMouseDown={(e) => (isEditing && !isMobile) && handleDragStart(e, label.muscle)}
+            >
+              <div className="space-y-1">
                 <div className={`flex items-center ${label.side === "left" ? "flex-row" : "flex-row-reverse"} gap-1`}>
-                  {/* Label Text */}
                   <div
                     className={`font-medium px-2 py-1 whitespace-nowrap ${
                       label.side === "left" ? "text-left" : "text-right"
@@ -536,151 +392,298 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
                       selectedMuscle === label.muscle
                         ? "font-bold text-primary"
                         : "text-foreground group-hover:font-semibold group-hover:text-primary"
+                    } ${isEditing && !label.hideLabel ? "bg-accent/20 rounded" : ""} ${
+                      editingLabel === label.muscle ? "ring-2 ring-primary animate-pulse bg-primary/10" : ""
                     } transition-all duration-200`}
-                    style={{ fontSize: label.fontSize }}
+                    style={{ fontSize: `${label.fontSize || labelSize}px` }}
                   >
                     {label.name}
                   </div>
 
-                  {/* Line and Point */}
-                  {!label.hideLineAndPoint && (
-                    <div className="relative flex items-center">
-                      <div
-                        className={`h-[1px] ${
-                          selectedMuscle === label.muscle ? "bg-primary" : "bg-muted-foreground group-hover:bg-primary"
-                        } transition-colors duration-200`}
-                        style={{ width: `${label.lineLength}px` }}
-                      />
-                      <div
-                        className={`w-2 h-2 rounded-full ${
-                          selectedMuscle === label.muscle ? "bg-primary" : "bg-muted-foreground group-hover:bg-primary"
-                        } transition-colors duration-200`}
-                      />
+                  {!label.hideLine && (
+                    <div className={`relative flex items-center ${
+                      (label.pointSide || label.side) !== label.side ? "flex-row-reverse" : ""
+                    }`}>
+                      {label.lineType === "angled" ? (
+                        // Linha em ângulo (formato L)
+                        <svg 
+                          width={label.lineWidth || lineWidth} 
+                          height="20" 
+                          className="overflow-visible"
+                          style={{ 
+                            transform: (label.pointSide || label.side) === "left" ? "scaleX(-1)" : "none"
+                          }}
+                        >
+                          <path
+                            d={`M 0,10 L ${((label.lineWidth || lineWidth) * 0.6)},10 L ${(label.lineWidth || lineWidth)},0`}
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1"
+                            className={`${
+                              selectedMuscle === label.muscle ? "text-primary" : "text-muted-foreground group-hover:text-primary"
+                            } transition-colors duration-200`}
+                          />
+                          <circle
+                            cx={(label.lineWidth || lineWidth)}
+                            cy="0"
+                            r="2"
+                            className={`${
+                              selectedMuscle === label.muscle ? "fill-primary" : "fill-muted-foreground group-hover:fill-primary"
+                            } transition-colors duration-200`}
+                          />
+                        </svg>
+                      ) : (
+                        // Linha reta (padrão)
+                        <>
+                          <div
+                            className={`h-[1px] ${
+                              selectedMuscle === label.muscle ? "bg-primary" : "bg-muted-foreground group-hover:bg-primary"
+                            } transition-colors duration-200`}
+                            style={{ width: `${label.lineWidth || lineWidth}px` }}
+                          />
+                          <div
+                            className={`w-2 h-2 rounded-full ${
+                              selectedMuscle === label.muscle ? "bg-primary" : "bg-muted-foreground group-hover:bg-primary"
+                            } transition-colors duration-200`}
+                          />
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
+
+                {/* Edit Controls */}
+                {isEditing && editingLabel === label.muscle && (
+                  <Card className="p-3 mt-2 shadow-xl z-50 bg-primary/5 backdrop-blur border-2 border-primary/30">
+                    <div className="space-y-2">
+                      <div className="text-xs font-semibold text-primary mb-2">Controles de Edição</div>
+                      <div className="flex gap-1 items-center flex-wrap">
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="h-8 px-3"
+                          onClick={(e) => handleRemoveLabel(label.muscle, e)}
+                          title="Remover label"
+                        >
+                          <X className="w-3 h-3 mr-1" />
+                          Remover
+                        </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 px-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleFlipSide(label.muscle);
+                        }}
+                        title="Inverter lado do label"
+                      >
+                        <ArrowLeftRight className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 px-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleFlipPointSide(label.muscle);
+                        }}
+                        title="Inverter lado do ponto"
+                      >
+                        <ArrowLeftRight className="w-3 h-3" />
+                        <span className="text-[10px]">P</span>
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 px-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleLineType(label.muscle);
+                        }}
+                        title={`Tipo de linha: ${label.lineType === "angled" ? "Ângulo" : "Reta"}`}
+                      >
+                        <GitBranch className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={label.hideLine ? "default" : "ghost"}
+                        className="h-7 px-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleLine(label.muscle);
+                        }}
+                        title={label.hideLine ? "Mostrar linha" : "Ocultar linha"}
+                      >
+                        <Slash className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={label.hideLabel ? "default" : "ghost"}
+                        className="h-7 px-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleLabel(label.muscle);
+                        }}
+                        title={label.hideLabel ? "Mostrar label" : "Ocultar label"}
+                      >
+                        <Type className="w-3 h-3" />
+                      </Button>
+                      </div>
+                      
+                      {/* Tamanho do Texto */}
+                      <div className="flex gap-2 items-center justify-between bg-background/50 p-2 rounded border border-primary/20">
+                        <span className="text-xs font-medium text-primary flex items-center gap-1">
+                          <Type className="w-3 h-3" />
+                          Tamanho do Texto
+                        </span>
+                        <div className="flex gap-1 items-center">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 w-8 p-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDecreaseFontSize(label.muscle);
+                            }}
+                            title="Diminuir texto"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </Button>
+                          <span className="text-sm font-semibold px-2 min-w-[30px] text-center bg-background rounded">
+                            {label.fontSize || labelSize}px
+                          </span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 w-8 p-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleIncreaseFontSize(label.muscle);
+                            }}
+                            title="Aumentar texto"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Tamanho da Linha */}
+                      <div className="flex gap-2 items-center justify-between bg-background/50 p-2 rounded border border-primary/20">
+                        <span className="text-xs font-medium text-primary flex items-center gap-1">
+                          <GitBranch className="w-3 h-3" />
+                          Tamanho da Linha
+                        </span>
+                        <div className="flex gap-1 items-center">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 w-8 p-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDecreaseLineWidth(label.muscle);
+                            }}
+                            title="Diminuir linha"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </Button>
+                          <span className="text-sm font-semibold px-2 min-w-[30px] text-center bg-background rounded">
+                            {label.lineWidth || lineWidth}px
+                          </span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 w-8 p-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleIncreaseLineWidth(label.muscle);
+                            }}
+                            title="Aumentar linha"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                )}
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Menu de Edição Inline */}
-      {isEditing && selectedLabel && editMenuPosition && selectedLabelData && (
-        <Card 
-          className="fixed z-50 w-[250px] shadow-lg"
-          style={{
-            top: `${editMenuPosition.top}px`,
-            left: `${editMenuPosition.left}px`,
-          }}
-        >
-          <CardContent className="p-3 space-y-3">
-            <div className="flex items-center justify-between border-b pb-2">
-              <span className="font-medium text-sm">{selectedLabelData.name}</span>
-              <Button 
-                size="sm" 
-                variant="ghost" 
-                onClick={() => {
-                  setSelectedLabel(null);
-                  setEditMenuPosition(null);
-                }}
-              >
-                ✕
-              </Button>
-            </div>
+      {/* Exercise Modal */}
+      <Dialog open={showExercises} onOpenChange={setShowExercises}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>
+              Exercícios para {selectedMuscleForExercises && getMuscleName(selectedMuscleForExercises)}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="overflow-y-auto flex-1 pr-2">
+            {selectedMuscleForExercises && (
+              <ExerciseList muscle={selectedMuscleForExercises as any} searchQuery="" />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
-            <div>
-              <label className="text-xs font-medium">Nome</label>
-              <input
-                type="text"
-                value={selectedLabelData.name}
-                onChange={(e) => handleNameChange(e.target.value)}
-                className="w-full px-2 py-1 text-sm border rounded mt-1"
+      {/* Add Label Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Adicionar Novo Label</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="label-name">Nome do Músculo</Label>
+              <Input
+                id="label-name"
+                placeholder="Ex: Deltoides"
+                value={newLabelData.name}
+                onChange={(e) => setNewLabelData(prev => ({ ...prev, name: e.target.value }))}
               />
             </div>
-
-            <div>
-              <label className="text-xs font-medium">Fonte: {selectedLabelData.fontSize}</label>
-              <Slider
-                value={[parseInt(selectedLabelData.fontSize)]}
-                onValueChange={handleFontSizeChange}
-                min={8}
-                max={24}
-                step={1}
-                className="mt-1"
+            <div className="space-y-2">
+              <Label htmlFor="label-muscle">Identificador (usado para exercícios)</Label>
+              <Input
+                id="label-muscle"
+                placeholder="Ex: deltoids"
+                value={newLabelData.muscle}
+                onChange={(e) => setNewLabelData(prev => ({ ...prev, muscle: e.target.value }))}
               />
             </div>
-
-            <div>
-              <label className="text-xs font-medium">Linha: {selectedLabelData.lineLength}px</label>
-              <Slider
-                value={[selectedLabelData.lineLength]}
-                onValueChange={handleLineWidthChange}
-                min={20}
-                max={120}
-                step={5}
-                className="mt-1"
-              />
+            <div className="space-y-2">
+              <Label>Lado Inicial</Label>
+              <div className="flex gap-2">
+                <Button
+                  variant={newLabelData.side === "left" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setNewLabelData(prev => ({ ...prev, side: "left" }))}
+                >
+                  Esquerda
+                </Button>
+                <Button
+                  variant={newLabelData.side === "right" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setNewLabelData(prev => ({ ...prev, side: "right" }))}
+                >
+                  Direita
+                </Button>
+              </div>
             </div>
-
-            <div className="flex gap-1">
-              <Button
-                size="sm"
-                onClick={() => handleSideChange("left")}
-                variant={selectedLabelData.side === "left" ? "default" : "outline"}
-                className="flex-1 text-xs"
-              >
-                Esq
+            <div className="flex gap-2 justify-end pt-4">
+              <Button variant="outline" onClick={() => setShowAddDialog(false)}>
+                Cancelar
               </Button>
-              <Button
-                size="sm"
-                onClick={() => handleSideChange("right")}
-                variant={selectedLabelData.side === "right" ? "default" : "outline"}
-                className="flex-1 text-xs"
-              >
-                Dir
+              <Button onClick={handleAddLabel}>
+                Adicionar
               </Button>
             </div>
-
-            <div className="flex gap-1">
-              <Button
-                size="sm"
-                onClick={() => handleLineTypeChange("straight")}
-                variant={selectedLabelData.lineType === "straight" ? "default" : "outline"}
-                className="flex-1 text-xs"
-              >
-                Reta
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => handleLineTypeChange("curved")}
-                variant={selectedLabelData.lineType === "curved" ? "default" : "outline"}
-                className="flex-1 text-xs"
-              >
-                Curva
-              </Button>
-            </div>
-
-            <Button
-              size="sm"
-              onClick={handleToggleLineAndPoint}
-              variant="outline"
-              className="w-full text-xs"
-            >
-              {selectedLabelData.hideLineAndPoint ? "Mostrar Linha" : "Ocultar Linha"}
-            </Button>
-
-            <Button
-              size="sm"
-              onClick={handleRemoveLabel}
-              variant="destructive"
-              className="w-full text-xs"
-            >
-              Remover Label
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
