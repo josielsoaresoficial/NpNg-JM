@@ -1,6 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
 import bodyFrontWorkout from "@/assets/body-front-workout-transparent.png";
 import bodyBackWorkout from "@/assets/body-back-workout-transparent.png";
 import { toast } from "sonner";
@@ -82,6 +85,7 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
   const [editableLabels, setEditableLabels] = useState<MuscleLabel[]>(baseLabels);
   const [draggedLabel, setDraggedLabel] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
   
   // Atualiza labels quando view ou dispositivo muda
   useState(() => {
@@ -159,16 +163,56 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
     console.log(`${viewType}Labels${device}:`, editableLabels);
     toast.success("Posições salvas com sucesso!");
   };
+  
+  const handleResetPositions = () => {
+    setEditableLabels(baseLabels);
+    setSelectedLabel(null);
+    toast.success("Posições resetadas!");
+  };
+  
+  const handleFontSizeChange = (value: number[]) => {
+    if (!selectedLabel) return;
+    setEditableLabels(prev => prev.map(label => 
+      label.muscle === selectedLabel ? { ...label, fontSize: value[0] } : label
+    ));
+  };
+  
+  const handleLineWidthChange = (value: number[]) => {
+    if (!selectedLabel) return;
+    setEditableLabels(prev => prev.map(label => 
+      label.muscle === selectedLabel ? { ...label, lineWidth: value[0] } : label
+    ));
+  };
+  
+  const handleSideChange = (side: "left" | "right") => {
+    if (!selectedLabel) return;
+    setEditableLabels(prev => prev.map(label => {
+      if (label.muscle === selectedLabel) {
+        return {
+          ...label,
+          side,
+          left: side === "left" ? "3.125%" : undefined,
+          right: side === "right" ? "3.125%" : undefined,
+        };
+      }
+      return label;
+    }));
+  };
+  
+  const selectedLabelData = editableLabels.find(l => l.muscle === selectedLabel);
 
   return (
     <div className="relative w-full flex flex-col items-center justify-center py-4 gap-4">
       {/* Controles do Editor */}
-      <div className="flex gap-2 z-30">
+      <div className="flex flex-wrap gap-2 z-30 justify-center">
         <Button
           onClick={() => {
             setIsEditing(!isEditing);
             if (!isEditing) {
               setEditableLabels(baseLabels);
+              setSelectedLabel(null);
+            } else {
+              setSelectedLabel(null);
             }
           }}
           variant={isEditing ? "destructive" : "default"}
@@ -176,11 +220,98 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
           {isEditing ? "Cancelar Edição" : "Ativar Modo Editor"}
         </Button>
         {isEditing && (
-          <Button onClick={handleSavePositions} variant="default">
-            Salvar Posições
-          </Button>
+          <>
+            <Button onClick={handleSavePositions} variant="default">
+              Salvar Posições
+            </Button>
+            <Button onClick={handleResetPositions} variant="outline">
+              Resetar
+            </Button>
+          </>
         )}
       </div>
+      
+      {/* Painel de Edição Avançado */}
+      {isEditing && (
+        <Card className="w-full max-w-[600px] z-30">
+          <CardContent className="pt-6 space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Selecionar Músculo:</label>
+              <Select value={selectedLabel || ""} onValueChange={setSelectedLabel}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Escolha um músculo para editar" />
+                </SelectTrigger>
+                <SelectContent>
+                  {labels.map(label => (
+                    <SelectItem key={label.muscle} value={label.muscle}>
+                      {label.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {selectedLabelData && (
+              <>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">
+                    Tamanho da Fonte: {selectedLabelData.fontSize || 14}px
+                  </label>
+                  <Slider
+                    value={[selectedLabelData.fontSize || 14]}
+                    onValueChange={handleFontSizeChange}
+                    min={8}
+                    max={24}
+                    step={1}
+                  />
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium mb-2 block">
+                    Largura da Linha: {selectedLabelData.lineWidth || 40}px
+                  </label>
+                  <Slider
+                    value={[selectedLabelData.lineWidth || 40]}
+                    onValueChange={handleLineWidthChange}
+                    min={20}
+                    max={80}
+                    step={5}
+                  />
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Lado:</label>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => handleSideChange("left")}
+                      variant={selectedLabelData.side === "left" ? "default" : "outline"}
+                      className="flex-1"
+                    >
+                      Esquerda
+                    </Button>
+                    <Button
+                      onClick={() => handleSideChange("right")}
+                      variant={selectedLabelData.side === "right" ? "default" : "outline"}
+                      className="flex-1"
+                    >
+                      Direita
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p>Posição: top: {selectedLabelData.top}</p>
+                  <p>
+                    {selectedLabelData.side === "left" 
+                      ? `left: ${selectedLabelData.left}` 
+                      : `right: ${selectedLabelData.right}`}
+                  </p>
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      )}
       
       <div 
         className="relative w-full max-w-[600px] flex items-center justify-center muscle-map-container"
@@ -207,13 +338,21 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
               key={label.muscle}
               className={`absolute pointer-events-auto group transition-all duration-200 ${
                 isEditing ? 'cursor-move' : 'cursor-pointer'
-              } ${draggedLabel === label.muscle ? 'z-50' : ''}`}
+              } ${draggedLabel === label.muscle ? 'z-50' : ''} ${
+                selectedLabel === label.muscle ? 'ring-2 ring-primary rounded-md' : ''
+              }`}
               style={{ 
                 top: label.top,
                 left: label.side === "left" && label.left ? label.left : undefined,
                 right: label.side === "right" && label.right ? label.right : undefined
               }}
-              onClick={() => handleLabelClick(label.muscle)}
+              onClick={() => {
+                if (isEditing) {
+                  setSelectedLabel(label.muscle);
+                } else {
+                  handleLabelClick(label.muscle);
+                }
+              }}
               onMouseDown={(e) => handleDragStart(e, label.muscle)}
               onTouchStart={(e) => handleDragStart(e, label.muscle)}
             >
