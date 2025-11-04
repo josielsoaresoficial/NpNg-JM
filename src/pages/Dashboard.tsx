@@ -224,7 +224,7 @@ const Dashboard = () => {
                 <ThemeSelector />
               </div>
             </div>
-            <p className="motivational-text text-foreground font-medium">{motivationalMessage}</p>
+            <p className="motivational-text text-foreground font-bold">{motivationalMessage}</p>
           </div>
           <div className="flex gap-2">
             <Link to="/workouts">
