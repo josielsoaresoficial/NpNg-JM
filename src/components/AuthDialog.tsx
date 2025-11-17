@@ -158,7 +158,17 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
           // Verifica se precisa confirmar email
           if (data?.user?.identities?.length === 0) {
             toast.error("Este email já está em uso. Tente fazer login.");
+          } else if (data?.user && !data?.session) {
+            // Email enviado para confirmação
+            toast.success(
+              "Conta criada! Verifique seu email para confirmar o cadastro e depois faça login.",
+              { duration: 8000 }
+            );
+            setEmail("");
+            setPassword("");
+            setIsLogin(true); // Volta para tela de login
           } else {
+            // Usuário já confirmado (não deveria acontecer com auto_confirm=false)
             toast.success("Conta criada com sucesso! Redirecionando...");
             onOpenChange(false);
             setEmail("");
