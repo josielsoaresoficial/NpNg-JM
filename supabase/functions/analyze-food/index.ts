@@ -184,23 +184,18 @@ serve(async (req) => {
     // Preparar imagem para a API (remover prefixo data:image se presente)
     const base64Image = image.replace(/^data:image\/[a-z]+;base64,/, "");
 
-    const systemPrompt = `Você é um especialista em nutrição e identificação de alimentos.
-Analise a imagem e retorne APENAS um JSON válido e conciso neste formato:
+    const systemPrompt = `Analise a imagem e retorne APENAS um JSON válido neste formato:
 {
   "foods": [
     {
-      "name": "nome do alimento em português (minúsculas)",
-      "portion": "porção estimada com unidade (ex: 150g, 1 xícara, 2 colheres)",
+      "name": "nome do alimento",
+      "portion": "quantidade (ex: 150g)",
       "confidence": "alta/média/baixa"
     }
   ],
-  "totalCalories": 0,
-  "totalProtein": 0,
-  "totalCarbs": 0,
-  "totalFat": 0,
-  "notes": "Resumo curto da refeição (máx. 2 frases)"
+  "notes": "resumo breve"
 }
-NÃO inclua explicações, apenas o JSON.`;
+NÃO calcule macros, apenas liste os alimentos e porções. Seja conciso.`;
 
     // Chamar Google Gemini API diretamente
     const response = await fetch(
@@ -226,7 +221,7 @@ NÃO inclua explicações, apenas o JSON.`;
           ],
           generationConfig: {
             temperature: 0.2,
-            maxOutputTokens: 1024,
+            maxOutputTokens: 4096,
           }
         }),
       }
