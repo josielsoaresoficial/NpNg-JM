@@ -119,16 +119,16 @@ export const WorkoutRecommendations = () => {
   return (
     <Card className="border-border/40 bg-card/50 backdrop-blur">
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            <CardTitle>Recomendações de Treino AI</CardTitle>
+            <Sparkles className="h-5 w-5 text-primary flex-shrink-0" />
+            <CardTitle className="text-lg sm:text-xl">Recomendações de Treino AI</CardTitle>
           </div>
           <Button 
             onClick={generateRecommendations} 
             disabled={isLoading}
             size="sm"
-            className="gap-2"
+            className="gap-2 w-full sm:w-auto"
           >
             {isLoading ? (
               <>
@@ -143,7 +143,7 @@ export const WorkoutRecommendations = () => {
             )}
           </Button>
         </div>
-        <CardDescription>
+        <CardDescription className="text-sm">
           Sugestões personalizadas de exercícios baseadas nos seus objetivos e histórico de treinos
         </CardDescription>
       </CardHeader>
@@ -179,21 +179,21 @@ export const WorkoutRecommendations = () => {
                     onClick={() => handleStartExercise(exercise)}
                   >
                     <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <CardTitle className="text-lg">{exercise.exerciseName}</CardTitle>
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                        <div className="flex-1 min-w-0">
+                          <CardTitle className="text-base sm:text-lg break-words">{exercise.exerciseName}</CardTitle>
                           <div className="flex flex-wrap gap-2 mt-2">
-                            <Badge variant="outline" className="border-primary/20">
+                            <Badge variant="outline" className="border-primary/20 text-xs">
                               {exercise.muscleGroup}
                             </Badge>
                             {exercise.difficulty && (
-                              <Badge variant="outline" className={getDifficultyColor(exercise.difficulty)}>
+                              <Badge variant="outline" className={`${getDifficultyColor(exercise.difficulty)} text-xs`}>
                                 {exercise.difficulty}
                               </Badge>
                             )}
                           </div>
                         </div>
-                        <div className="flex flex-col items-end gap-1 text-sm text-muted-foreground">
+                        <div className="flex flex-row sm:flex-col items-center sm:items-end gap-2 sm:gap-1 text-xs sm:text-sm text-muted-foreground flex-shrink-0">
                           <div className="flex items-center gap-1">
                             <Dumbbell className="h-3 w-3" />
                             <span>{exercise.sets} sets × {exercise.reps}</span>
@@ -201,14 +201,14 @@ export const WorkoutRecommendations = () => {
                           {exercise.restTime && (
                             <div className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
-                              <span>{exercise.restTime}s rest</span>
+                              <span>{exercise.restTime}s</span>
                             </div>
                           )}
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm text-muted-foreground italic">
+                      <p className="text-xs sm:text-sm text-muted-foreground italic">
                         {exercise.reason}
                       </p>
                     </CardContent>
