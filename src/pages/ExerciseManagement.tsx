@@ -5,12 +5,13 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Search, Filter, Database, Upload, Plus } from 'lucide-react';
+import { Search, Filter, Database, Upload, Plus, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/untyped';
 import { toast } from 'sonner';
 import ExerciseManagementCard from '@/components/ExerciseManagementCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BulkGifUploader } from '@/components/BulkGifUploader';
+import { GifValidationUploader } from '@/components/GifValidationUploader';
 import AddExerciseDialog from '@/components/AddExerciseDialog';
 
 interface Exercise {
@@ -36,6 +37,7 @@ const ExerciseManagement: React.FC = () => {
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
   const [bulkUploadOpen, setBulkUploadOpen] = useState(false);
+  const [validationUploadOpen, setValidationUploadOpen] = useState(false);
   const [addExerciseOpen, setAddExerciseOpen] = useState(false);
 
   const muscleGroups = [
@@ -137,6 +139,13 @@ const ExerciseManagement: React.FC = () => {
               >
                 <Plus className="w-4 h-4" />
                 Novo Exercício
+              </Button>
+              <Button 
+                onClick={() => setValidationUploadOpen(true)}
+                className="flex items-center gap-2 bg-gradient-hero"
+              >
+                <Sparkles className="w-4 h-4" />
+                Validação Inteligente
               </Button>
               <Button 
                 onClick={() => setBulkUploadOpen(true)}
@@ -269,6 +278,27 @@ const ExerciseManagement: React.FC = () => {
           onOpenChange={setAddExerciseOpen}
           onSuccess={fetchExercises}
         />
+
+        {/* Validation Upload Dialog */}
+        <Dialog open={validationUploadOpen} onOpenChange={setValidationUploadOpen}>
+          <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-primary" />
+                Validação Inteligente de GIFs com IA
+              </DialogTitle>
+              <DialogDescription>
+                Sistema avançado: analisa cada GIF com IA, valida nomes, sugere correções e associa automaticamente
+              </DialogDescription>
+            </DialogHeader>
+            <GifValidationUploader 
+              onComplete={() => {
+                fetchExercises();
+                setValidationUploadOpen(false);
+              }} 
+            />
+          </DialogContent>
+        </Dialog>
 
         {/* Bulk Upload Dialog */}
         <Dialog open={bulkUploadOpen} onOpenChange={setBulkUploadOpen}>
