@@ -3,5 +3,8 @@ project_id = "mpcnsxyqpfaorlxingur"
 [functions.analyze-food]
 verify_jwt = false
 
+[functions.analyze-exercise-gif]
+verify_jwt = true
+
 [functions.send-push-notification]
 verify_jwt = true
