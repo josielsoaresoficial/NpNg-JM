@@ -16,6 +16,7 @@ import { BulkGifUploader } from '@/components/BulkGifUploader';
 import { GifValidationUploader } from '@/components/GifValidationUploader';
 import AddExerciseDialog from '@/components/AddExerciseDialog';
 import { PopulateSubdivisions } from '@/components/PopulateSubdivisions';
+import AutoGifUploader from '@/components/AutoGifUploader';
 
 interface Exercise {
   id: string;
@@ -42,6 +43,7 @@ const ExerciseManagement: React.FC = () => {
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
   const [bulkUploadOpen, setBulkUploadOpen] = useState(false);
   const [validationUploadOpen, setValidationUploadOpen] = useState(false);
+  const [autoUploadOpen, setAutoUploadOpen] = useState(false);
   const [addExerciseOpen, setAddExerciseOpen] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [rebuildConfirmOpen, setRebuildConfirmOpen] = useState(false);
@@ -258,7 +260,15 @@ const ExerciseManagement: React.FC = () => {
             </div>
             <div className="flex gap-2">
               <Button 
+                onClick={() => setAutoUploadOpen(true)}
+                className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600"
+              >
+                <Upload className="w-4 h-4" />
+                Upload Automático
+              </Button>
+              <Button 
                 onClick={() => setAddExerciseOpen(true)}
+                variant="outline"
                 className="flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" />
@@ -428,6 +438,33 @@ const ExerciseManagement: React.FC = () => {
           onOpenChange={setAddExerciseOpen}
           onSuccess={fetchExercises}
         />
+
+        {/* Auto Upload Dialog */}
+        <Dialog open={autoUploadOpen} onOpenChange={setAutoUploadOpen}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Upload className="w-5 h-5 text-green-500" />
+                Upload Automático de GIFs
+              </DialogTitle>
+              <DialogDescription>
+                Cada GIF criará automaticamente um exercício no banco de dados
+              </DialogDescription>
+            </DialogHeader>
+            <AutoGifUploader />
+            <div className="flex justify-end gap-2 mt-4">
+              <Button 
+                onClick={() => {
+                  setAutoUploadOpen(false);
+                  fetchExercises();
+                }}
+                variant="outline"
+              >
+                Fechar e Atualizar
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Validation Upload Dialog */}
         <Dialog open={validationUploadOpen} onOpenChange={setValidationUploadOpen}>
