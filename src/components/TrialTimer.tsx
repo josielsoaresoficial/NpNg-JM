@@ -20,14 +20,14 @@ export function TrialTimer() {
   return (
     <div 
       className={cn(
-        "fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-2 rounded-lg",
+        "fixed top-2 right-2 z-50 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg",
         "bg-red-500/90 text-white backdrop-blur-sm shadow-lg",
         "transition-all duration-300",
         isUrgent && "animate-pulse"
       )}
     >
-      <Clock className="w-4 h-4" />
-      <span className="font-mono text-sm font-semibold">
+      <Clock className="w-3 h-3" />
+      <span className="font-mono text-xs font-semibold">
         {formattedTime}
       </span>
     </div>
