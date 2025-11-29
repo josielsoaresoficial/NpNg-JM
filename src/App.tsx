@@ -6,6 +6,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { TrialTimer } from "@/components/TrialTimer";
+import { PremiumBlocker } from "@/components/PremiumBlocker";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -42,6 +45,47 @@ const queryClient = new QueryClient({
   },
 });
 
+const AppContent = () => {
+  const { isTrialExpired, isPremium } = useTrialStatus();
+
+  return (
+    <>
+      <TrialTimer />
+      {isTrialExpired && !isPremium && <PremiumBlocker />}
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/onboarding" element={<Onboarding />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/workouts" element={<Workouts />} />
+        <Route path="/nutrition" element={<Nutrition />} />
+        <Route path="/progress" element={<Progress />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/exercises" element={<Exercises />} />
+        <Route path="/stats/calories-burned" element={<CaloriesBurnedPage />} />
+        <Route path="/stats/hydration" element={<HydrationPage />} />
+        <Route path="/stats/protein-goal" element={<ProteinGoalPage />} />
+        <Route path="/stats/workout-time" element={<WorkoutTimePage />} />
+        <Route path="/workout-player/:id" element={<WorkoutPlayer />} />
+        <Route path="/workouts/muscle/:muscleName" element={<MuscleWorkoutPage />} />
+        <Route path="/exercise-library" element={<ExerciseLibrary />} />
+        <Route path="/exercise/:id" element={<ExerciseDetail />} />
+        <Route path="/workout-session/:programId/:dayId" element={<WorkoutSession />} />
+        <Route path="/workout-session" element={<WorkoutSession />} />
+        <Route path="/exercise-management" element={<ExerciseManagement />} />
+        <Route path="/favorite-recipes" element={<FavoriteRecipes />} />
+        <Route path="/exercise-stats" element={<ExerciseStats />} />
+        <Route path="/workout-history" element={<WorkoutHistory />} />
+        <Route path="/custom-workouts" element={<CustomWorkouts />} />
+        <Route path="/custom-foods" element={<CustomFoods />} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
+  );
+};
+
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
@@ -51,40 +95,11 @@ const App = () => {
           <Sonner />
           <PWAInstallPrompt />
           <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/onboarding" element={<Onboarding />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/workouts" element={<Workouts />} />
-            <Route path="/nutrition" element={<Nutrition />} />
-            <Route path="/progress" element={<Progress />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/exercises" element={<Exercises />} />
-            <Route path="/stats/calories-burned" element={<CaloriesBurnedPage />} />
-            <Route path="/stats/hydration" element={<HydrationPage />} />
-            <Route path="/stats/protein-goal" element={<ProteinGoalPage />} />
-            <Route path="/stats/workout-time" element={<WorkoutTimePage />} />
-            <Route path="/workout-player/:id" element={<WorkoutPlayer />} />
-          <Route path="/workouts/muscle/:muscleName" element={<MuscleWorkoutPage />} />
-          <Route path="/exercise-library" element={<ExerciseLibrary />} />
-          <Route path="/exercise/:id" element={<ExerciseDetail />} />
-          <Route path="/workout-session/:programId/:dayId" element={<WorkoutSession />} />
-          <Route path="/workout-session" element={<WorkoutSession />} />
-          <Route path="/exercise-management" element={<ExerciseManagement />} />
-          <Route path="/favorite-recipes" element={<FavoriteRecipes />} />
-          <Route path="/exercise-stats" element={<ExerciseStats />} />
-          <Route path="/workout-history" element={<WorkoutHistory />} />
-          <Route path="/custom-workouts" element={<CustomWorkouts />} />
-          <Route path="/custom-foods" element={<CustomFoods />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+            <AppContent />
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 };
 
