@@ -18,6 +18,7 @@ import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { TrialTimer } from "@/components/TrialTimer";
 import { useProfileStats } from "@/hooks/useProfileStats";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AchievementsSection } from "@/components/AchievementsSection";
 
 const Profile = () => {
   // === INÍCIO DAS MODIFICAÇÕES ===
@@ -592,6 +593,9 @@ const Profile = () => {
 
         {/* Push Notifications */}
         <PushNotificationSettings />
+
+        {/* Achievements Section */}
+        <AchievementsSection />
 
         {/* Subscription */}
         <GymCard
