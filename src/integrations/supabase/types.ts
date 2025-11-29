@@ -392,8 +392,11 @@ export type Database = {
           gender: string | null
           height: number | null
           id: string
+          is_premium: boolean | null
           name: string | null
           onboarding_completed: boolean | null
+          trial_expired: boolean | null
+          trial_started_at: string | null
           updated_at: string
           user_id: string
           weight: number | null
@@ -410,8 +413,11 @@ export type Database = {
           gender?: string | null
           height?: number | null
           id?: string
+          is_premium?: boolean | null
           name?: string | null
           onboarding_completed?: boolean | null
+          trial_expired?: boolean | null
+          trial_started_at?: string | null
           updated_at?: string
           user_id: string
           weight?: number | null
@@ -428,8 +434,11 @@ export type Database = {
           gender?: string | null
           height?: number | null
           id?: string
+          is_premium?: boolean | null
           name?: string | null
           onboarding_completed?: boolean | null
+          trial_expired?: boolean | null
+          trial_started_at?: string | null
           updated_at?: string
           user_id?: string
           weight?: number | null

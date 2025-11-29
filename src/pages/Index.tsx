@@ -12,6 +12,7 @@ import workoutsImage from "@/assets/workouts-hero.jpg";
 import { AuthDialog } from "@/components/AuthDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { Clock } from "@/components/Clock";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -21,6 +22,7 @@ const Index = () => {
   const [currentVideo, setCurrentVideo] = useState(0);
   const { user } = useAuth();
   const { onboardingCompleted, loading } = useOnboardingStatus();
+  const { startTrial, isTrialActive } = useTrialStatus();
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
@@ -30,8 +32,13 @@ const Index = () => {
   // Usuários navegam livremente pela landing page
   // Autenticação/onboarding acontece apenas quando clicam em botões específicos
 
-  const handleProtectedAction = (path: string) => {
+  const handleProtectedAction = async (path: string) => {
     if (user) {
+      // Iniciar trial se ainda não foi iniciado
+      if (!isTrialActive) {
+        await startTrial();
+      }
+
       if (!loading && !onboardingCompleted && path === "/dashboard") {
         navigate("/onboarding");
       } else {
@@ -85,12 +92,17 @@ const Index = () => {
                 variant="hero" 
                 size="lg" 
                 className="w-full sm:w-auto"
-                onClick={() => setAuthDialogOpen(true)}
+                onClick={() => handleProtectedAction("/dashboard")}
               >
                 <Zap className="w-5 h-5" />
-                Começar Agora
+                Iniciar Jornada Gratuita
               </Button>
-              <Button variant="outline" size="lg" className="w-full sm:w-auto border-white/30 text-white hover:bg-white/10">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="w-full sm:w-auto border-white/30 text-white hover:bg-white/10"
+                onClick={() => handleProtectedAction("/dashboard")}
+              >
                 Ver Demo
               </Button>
             </div>
