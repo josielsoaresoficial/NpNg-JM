@@ -481,6 +481,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_achievements: {
+        Row: {
+          achievement_type: string
+          id: string
+          shared_count: number | null
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          achievement_type: string
+          id?: string
+          shared_count?: number | null
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          achievement_type?: string
+          id?: string
+          shared_count?: number | null
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       workout_history: {
         Row: {
           calories_burned: number | null
