@@ -339,7 +339,7 @@ const RobotButton = ({ onClick, isActive, isListening, isSpeaking, isProcessing 
                     : "M 40 60 Q 50 63 60 60"   // Sorriso dormindo
               }}
               transition={{ 
-                duration: isSpeaking ? 0.25 : 0.5,
+                duration: isSpeaking ? 0.5 : 0.5,
                 repeat: isSpeaking ? Infinity : 0,
                 ease: "easeInOut"
               }}
@@ -357,7 +357,7 @@ const RobotButton = ({ onClick, isActive, isListening, isSpeaking, isProcessing 
                   opacity: [0.3, 0, 0.2, 0, 0.25, 0],
                 }}
                 transition={{
-                  duration: 0.25,
+                  duration: 0.5,
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
