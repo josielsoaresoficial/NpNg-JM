@@ -15,7 +15,8 @@ const NutriAI = () => {
     startConversation,
     isProcessing,
     voiceProvider,
-    setVoiceProvider 
+    setVoiceProvider,
+    currentMood
   } = useChat('google-male');
   
   const [isActive, setIsActive] = useState(false);
@@ -104,6 +105,7 @@ const NutriAI = () => {
         isListening={voiceRecognition.status === 'listening' && !isAISpeaking}
         isSpeaking={isAISpeaking}
         isProcessing={isProcessing}
+        mood={currentMood}
       />
 
       <SaveRecipeDialog 

@@ -37,6 +37,7 @@ export const useChat = (initialVoiceProvider: VoiceProvider = 'google-male') => 
     userPreferences: [],
     mood: 'neutral'
   });
+  const [currentMood, setCurrentMood] = useState<'neutral' | 'happy' | 'thinking' | 'excited' | 'grateful'>('neutral');
   
   const { speak, isLoading: isVoiceLoading } = useVoice();
   const chatHistoryRef = useRef<Message[]>([]);
@@ -219,6 +220,7 @@ export const useChat = (initialVoiceProvider: VoiceProvider = 'google-male') => 
     if (!content.trim() || isProcessing) return;
 
     setIsProcessing(true);
+    setCurrentMood('thinking'); // Pensativo ao processar
     
     // Criar conversa se não existir
     if (!currentConversationId && user?.id) {
@@ -239,6 +241,26 @@ export const useChat = (initialVoiceProvider: VoiceProvider = 'google-male') => 
     try {
       // Analisar intenção
       const intent = analyzeIntent(content);
+      
+      // Definir mood baseado no tipo de intenção
+      switch (intent.type) {
+        case 'meal_suggestion':
+          setCurrentMood('happy'); // Feliz ao sugerir receitas
+          break;
+        case 'thanks':
+          setCurrentMood('grateful'); // Agradecido
+          break;
+        case 'energy':
+        case 'muscle_gain':
+          setCurrentMood('excited'); // Animado com objetivos
+          break;
+        case 'set_name':
+        case 'greeting':
+          setCurrentMood('happy'); // Feliz em cumprimentos
+          break;
+        default:
+          setCurrentMood('neutral');
+      }
       
       // Processar intenção de nome localmente com humor
       let aiResponse = '';
@@ -362,6 +384,7 @@ export const useChat = (initialVoiceProvider: VoiceProvider = 'google-male') => 
     conversationContext,
     voiceProvider,
     setVoiceProvider,
-    currentConversationId
+    currentConversationId,
+    currentMood
   };
 };
