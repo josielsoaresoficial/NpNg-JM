@@ -6,9 +6,91 @@ interface RobotButtonProps {
   isListening?: boolean;
   isSpeaking?: boolean;
   isProcessing?: boolean;
+  mood?: 'neutral' | 'happy' | 'thinking' | 'excited' | 'grateful';
 }
 
-const RobotButton = ({ onClick, isActive, isListening, isSpeaking, isProcessing }: RobotButtonProps) => {
+const RobotButton = ({ onClick, isActive, isListening, isSpeaking, isProcessing, mood = 'neutral' }: RobotButtonProps) => {
+  // Definir forma dos olhos baseado no mood
+  const getEyeShape = (isLeft: boolean) => {
+    const base = isLeft ? 36 : 58;
+    const mid = isLeft ? 39 : 61;
+    const end = isLeft ? 42 : 64;
+    
+    if (!isActive) {
+      // Dormindo - arco pra baixo (fechado)
+      return `M ${base} 48 Q ${mid} 51 ${end} 48`;
+    }
+    
+    switch (mood) {
+      case 'happy':
+        // Feliz - arco bem aberto e alto
+        return `M ${base} 50 Q ${mid} 45 ${end} 50`;
+      case 'thinking':
+        // Pensativo - semicerrado
+        return `M ${base} 49 Q ${mid} 47 ${end} 49`;
+      case 'excited':
+        // Animado - bem aberto e redondo
+        return `M ${base} 51 Q ${mid} 44 ${end} 51`;
+      case 'grateful':
+        // Agradecido - suave e levemente fechado
+        return `M ${base} 49 Q ${mid} 46 ${end} 49`;
+      default:
+        // Neutro - arco padrão
+        return `M ${base} 50 Q ${mid} 47 ${end} 50`;
+    }
+  };
+
+  // Definir forma da boca baseado no mood
+  const getMouthShape = () => {
+    if (!isActive) {
+      return "M 40 60 Q 50 63 60 60"; // Dormindo
+    }
+    
+    if (isSpeaking) {
+      // Quando falando, usar animação existente
+      return [
+        "M 38 55 Q 50 75 62 55",
+        "M 40 60 Q 50 62 60 60",
+        "M 39 57 Q 50 70 61 57",
+        "M 40 60 Q 50 62 60 60",
+        "M 38 56 Q 50 72 62 56",
+        "M 40 60 Q 50 64 60 60",
+      ];
+    }
+    
+    switch (mood) {
+      case 'happy':
+        // Feliz - sorriso grande
+        return "M 38 60 Q 50 68 62 60";
+      case 'thinking':
+        // Pensativo - linha quase reta
+        return "M 40 61 Q 50 62 60 61";
+      case 'excited':
+        // Animado - sorriso enorme
+        return "M 36 59 Q 50 70 64 59";
+      case 'grateful':
+        // Agradecido - sorriso suave
+        return "M 40 60 Q 50 66 60 60";
+      default:
+        // Neutro - sorriso padrão
+        return "M 40 60 Q 50 65 60 60";
+    }
+  };
+
+  // Velocidade de pulsação das antenas baseada no mood
+  const getAntennaPulseSpeed = () => {
+    switch (mood) {
+      case 'excited':
+        return 0.6; // Rápido
+      case 'thinking':
+        return 1.5; // Devagar
+      case 'happy':
+      case 'grateful':
+        return 0.8; // Médio-rápido
+      default:
+        return 1.0; // Normal
+    }
+  };
   return (
     <motion.button
       onClick={onClick}
@@ -256,90 +338,55 @@ const RobotButton = ({ onClick, isActive, isListening, isSpeaking, isProcessing 
               strokeWidth="0.5"
             />
 
-            {/* Olhos - Arcos sorridentes estilo kawaii */}
-            {!isActive && (
-              <>
-                {/* Olho esquerdo fechado */}
-                <motion.path
-                  d="M 36 48 Q 39 51 42 48"
-                  stroke="#6dd5ed"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  fill="none"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 0.3 }}
-                />
-                {/* Olho direito fechado */}
-                <motion.path
-                  d="M 58 48 Q 61 51 64 48"
-                  stroke="#6dd5ed"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  fill="none"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 0.3 }}
-                />
-              </>
-            )}
+            {/* Olhos - Expressões contextuais */}
+            <motion.path
+              stroke="#6dd5ed"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              fill="none"
+              animate={{
+                d: isSpeaking 
+                  ? [getEyeShape(true), `M 36 50 Q 39 46 42 50`, getEyeShape(true)]
+                  : getEyeShape(true)
+              }}
+              transition={{ 
+                duration: isSpeaking ? 0.5 : 0.4, 
+                repeat: isSpeaking ? Infinity : 0,
+                ease: "easeInOut"
+              }}
+            />
+            
+            <motion.path
+              stroke="#6dd5ed"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              fill="none"
+              animate={{
+                d: isSpeaking 
+                  ? [getEyeShape(false), `M 58 50 Q 61 46 64 50`, getEyeShape(false)]
+                  : getEyeShape(false)
+              }}
+              transition={{ 
+                duration: isSpeaking ? 0.5 : 0.4, 
+                repeat: isSpeaking ? Infinity : 0,
+                ease: "easeInOut",
+                delay: isSpeaking ? 0.1 : 0
+              }}
+            />
 
-            {isActive && (
-              <>
-                {/* Olho esquerdo aberto */}
-                <motion.path
-                  d="M 36 50 Q 39 47 42 50"
-                  stroke="#6dd5ed"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  fill="none"
-                  animate={{
-                    d: isSpeaking 
-                      ? ["M 36 50 Q 39 47 42 50", "M 36 50 Q 39 46 42 50", "M 36 50 Q 39 47 42 50"]
-                      : "M 36 50 Q 39 47 42 50"
-                  }}
-                  transition={{ duration: 0.5, repeat: isSpeaking ? Infinity : 0 }}
-                />
-                
-                {/* Olho direito aberto */}
-                <motion.path
-                  d="M 58 50 Q 61 47 64 50"
-                  stroke="#6dd5ed"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  fill="none"
-                  animate={{
-                    d: isSpeaking 
-                      ? ["M 58 50 Q 61 47 64 50", "M 58 50 Q 61 46 64 50", "M 58 50 Q 61 47 64 50"]
-                      : "M 58 50 Q 61 47 64 50"
-                  }}
-                  transition={{ duration: 0.5, repeat: isSpeaking ? Infinity : 0 }}
-                />
-              </>
-            )}
-
-            {/* Boca animada (fala quando isSpeaking) */}
+            {/* Boca animada (expressões contextuais) */}
             <motion.path
               stroke="#5a7f93"
               strokeWidth="2"
               strokeLinecap="round"
               fill="none"
               animate={{
-                d: isSpeaking 
-                  ? [
-                      "M 38 55 Q 50 75 62 55",  // Boca bem aberta (forma de "O")
-                      "M 40 60 Q 50 62 60 60",  // Boca fechada
-                      "M 39 57 Q 50 70 61 57",  // Boca média-aberta
-                      "M 40 60 Q 50 62 60 60",  // Boca fechada
-                      "M 38 56 Q 50 72 62 56",  // Boca aberta variação
-                      "M 40 60 Q 50 64 60 60",  // Boca levemente aberta
-                    ]
-                  : isActive 
-                    ? "M 40 60 Q 50 65 60 60"   // Sorriso acordado
-                    : "M 40 60 Q 50 63 60 60"   // Sorriso dormindo
+                d: isSpeaking && Array.isArray(getMouthShape())
+                  ? getMouthShape()
+                  : getMouthShape()
               }}
               transition={{ 
-                duration: isSpeaking ? 0.5 : 0.5,
+                duration: isSpeaking ? 0.5 : 0.4,
                 repeat: isSpeaking ? Infinity : 0,
                 ease: "easeInOut"
               }}
@@ -384,7 +431,7 @@ const RobotButton = ({ onClick, isActive, isListening, isSpeaking, isProcessing 
                   opacity: isActive ? [1, 0.5, 1] : [0.7, 0.4, 0.7],
                 }}
                 transition={{
-                  duration: 1,
+                  duration: getAntennaPulseSpeed(),
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
@@ -400,7 +447,7 @@ const RobotButton = ({ onClick, isActive, isListening, isSpeaking, isProcessing 
                   opacity: isActive ? [0.7, 0.3, 0.7] : [0.4, 0.2, 0.4],
                 }}
                 transition={{
-                  duration: 1,
+                  duration: getAntennaPulseSpeed(),
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
@@ -427,7 +474,7 @@ const RobotButton = ({ onClick, isActive, isListening, isSpeaking, isProcessing 
                   opacity: isActive ? [0.5, 1, 0.5] : [0.4, 0.7, 0.4],
                 }}
                 transition={{
-                  duration: 1,
+                  duration: getAntennaPulseSpeed(),
                   repeat: Infinity,
                   ease: "easeInOut",
                   delay: 0.5
@@ -444,7 +491,7 @@ const RobotButton = ({ onClick, isActive, isListening, isSpeaking, isProcessing 
                   opacity: isActive ? [0.3, 0.7, 0.3] : [0.2, 0.4, 0.2],
                 }}
                 transition={{
-                  duration: 1,
+                  duration: getAntennaPulseSpeed(),
                   repeat: Infinity,
                   ease: "easeInOut",
                   delay: 0.5
