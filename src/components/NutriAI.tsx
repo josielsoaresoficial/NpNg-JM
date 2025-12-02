@@ -86,17 +86,8 @@ const NutriAI = () => {
       setTimeout(() => {
         setShowDialogue(false);
       }, 5000);
-    } else if (isListening) {
-      // Parar de ouvir
-      stopListening();
-    } else if (isAISpeaking || isProcessing) {
-      // Se está falando ou processando, começar a ouvir
-      startListening();
-      setMood('neutral');
-      setDialogueText('Estou ouvindo... 🎤');
-      setShowDialogue(true);
     } else {
-      // Voltar a dormir
+      // Dormir - para tudo e desativa
       handleSleep();
     }
   };
