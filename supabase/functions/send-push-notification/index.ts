@@ -44,15 +44,44 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Manual JWT validation
+    const authHeader = req.headers.get('Authorization');
+    let authenticatedUserId: string | null = null;
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.replace('Bearer ', '');
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser(token);
+        if (!error && user) {
+          authenticatedUserId = user.id;
+          console.log('✅ User authenticated:', authenticatedUserId);
+        } else {
+          console.log('⚠️ Token validation failed:', error?.message);
+        }
+      } catch (authError) {
+        console.log('⚠️ Auth error:', authError);
+      }
+    } else {
+      console.log('⚠️ No Authorization header provided');
+    }
+
     const payload: NotificationPayload = await req.json();
     const { title, body, icon, badge, tag, data, userId } = payload;
 
-    console.log('📧 Sending push notification:', { title, userId });
+    console.log('📧 Sending push notification:', { title, userId, authenticatedUserId });
+
+    // Determine target user(s)
+    let targetUserId = userId;
+    
+    // If no specific userId provided and user is authenticated, send to authenticated user
+    if (!targetUserId && authenticatedUserId) {
+      targetUserId = authenticatedUserId;
+    }
 
     // Fetch subscriptions
     let query = supabase.from('push_subscriptions').select('*');
-    if (userId) {
-      query = query.eq('user_id', userId);
+    if (targetUserId) {
+      query = query.eq('user_id', targetUserId);
     }
 
     const { data: subscriptions, error: fetchError } = await query;
@@ -63,7 +92,7 @@ serve(async (req) => {
     }
 
     if (!subscriptions || subscriptions.length === 0) {
-      console.log('⚠️ No subscriptions found');
+      console.log('⚠️ No subscriptions found for user:', targetUserId);
       return new Response(
         JSON.stringify({ message: 'No subscriptions found', sent: 0 }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
@@ -98,7 +127,7 @@ serve(async (req) => {
           console.log('✅ Notification sent to:', subscription.endpoint.substring(0, 50) + '...');
           return { success: true, endpoint: subscription.endpoint };
         } catch (error: any) {
-          console.error('❌ Error sending to subscription:', error.message);
+          console.error('❌ Error sending to subscription:', error.message, error.statusCode);
           
           // If subscription is expired or invalid, remove it from database
           if (error.statusCode === 404 || error.statusCode === 410) {
@@ -109,7 +138,7 @@ serve(async (req) => {
               .eq('endpoint', subscription.endpoint);
           }
           
-          return { success: false, endpoint: subscription.endpoint, error: error.message };
+          return { success: false, endpoint: subscription.endpoint, error: error.message, statusCode: error.statusCode };
         }
       })
     );
@@ -118,6 +147,18 @@ serve(async (req) => {
     const failed = results.length - successful;
 
     console.log(`✅ Sent: ${successful}, ❌ Failed: ${failed}`);
+
+    // Log detailed results for debugging
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        const value = result.value as any;
+        if (!value.success) {
+          console.log(`  Failed ${index + 1}: ${value.error} (status: ${value.statusCode})`);
+        }
+      } else {
+        console.log(`  Rejected ${index + 1}: ${result.reason}`);
+      }
+    });
 
     return new Response(
       JSON.stringify({ 
