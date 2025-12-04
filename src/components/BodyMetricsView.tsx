@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import bodyFront from "@/assets/body-front.png";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useBodyMetrics } from "@/hooks/useBodyMetrics";
@@ -145,25 +146,12 @@ export const BodyMetricsView = () => {
           <div className="flex items-start gap-4">
             {/* Silhueta do corpo */}
             <div className="relative flex-shrink-0">
-              <div className="w-32 h-48 bg-muted rounded-lg flex items-center justify-center">
-                <svg
-                  viewBox="0 0 100 200"
-                  className="w-full h-full text-muted-foreground/30"
-                  fill="currentColor"
-                >
-                  {/* Cabeça */}
-                  <ellipse cx="50" cy="25" rx="12" ry="15" />
-                  {/* Pescoço */}
-                  <rect x="47" y="38" width="6" height="8" />
-                  {/* Torso */}
-                  <path d="M 35 46 L 35 100 L 40 110 L 40 140 L 45 145 L 55 145 L 60 140 L 60 110 L 65 100 L 65 46 Z" />
-                  {/* Braços */}
-                  <rect x="25" y="50" width="8" height="45" rx="4" />
-                  <rect x="67" y="50" width="8" height="45" rx="4" />
-                  {/* Pernas */}
-                  <rect x="40" y="145" width="8" height="50" rx="4" />
-                  <rect x="52" y="145" width="8" height="50" rx="4" />
-                </svg>
+              <div className="w-32 h-48 bg-gradient-to-b from-muted/50 to-muted rounded-xl overflow-hidden flex items-center justify-center">
+                <img
+                  src={bodyFront}
+                  alt="Silhueta corporal"
+                  className="w-auto h-full object-contain opacity-80"
+                />
               </div>
               <Button
                 size="icon"
