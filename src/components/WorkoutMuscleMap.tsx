@@ -1,13 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import { Settings, Save, Edit2, ArrowLeftRight, Plus, Minus, X, PlusCircle, GitBranch, Type, Slash, Cloud, CloudOff } from "lucide-react";
-
-const triggerHapticFeedback = () => {
-  if (typeof navigator !== 'undefined' && navigator.vibrate) {
-    navigator.vibrate(10);
-  }
-};
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
@@ -44,25 +37,25 @@ interface MuscleLabel {
 }
 
 const frontLabels: MuscleLabel[] = [
-  { name: "Peitoral", muscle: "chest", side: "right", top: "20%", lineWidth: 50 },
-  { name: "Ombros", muscle: "shoulders", side: "left", top: "16%", lineWidth: 45 },
-  { name: "Bíceps", muscle: "biceps", side: "left", top: "30%", lineWidth: 35 },
-  { name: "Abdômen", muscle: "abs", side: "right", top: "36%", lineWidth: 55 },
-  { name: "Antebraços", muscle: "forearms", side: "right", top: "48%", lineWidth: 30 },
-  { name: "Oblíquos", muscle: "obliques", side: "left", top: "44%", lineWidth: 40 },
-  { name: "Quadríceps", muscle: "legs", side: "left", top: "62%", lineWidth: 50 },
-  { name: "Adutores", muscle: "adductors", side: "right", top: "62%", lineWidth: 50 },
-  { name: "Panturrilhas", muscle: "calves", side: "right", top: "78%", lineWidth: 55 },
+  { name: "Peitoral", muscle: "chest", side: "right", top: "20%" },
+  { name: "Ombros", muscle: "shoulders", side: "left", top: "16%" },
+  { name: "Bíceps", muscle: "biceps", side: "left", top: "30%" },
+  { name: "Abdômen", muscle: "abs", side: "right", top: "36%" },
+  { name: "Antebraços", muscle: "forearms", side: "right", top: "48%" },
+  { name: "Oblíquos", muscle: "obliques", side: "left", top: "44%" },
+  { name: "Quadríceps", muscle: "legs", side: "left", top: "62%" },
+  { name: "Adutores", muscle: "adductors", side: "right", top: "62%" },
+  { name: "Panturrilhas", muscle: "calves", side: "right", top: "78%" },
 ];
 
 const backLabels: MuscleLabel[] = [
-  { name: "Trapézio", muscle: "traps", side: "right", top: "14%", lineWidth: 45 },
-  { name: "Dorsais", muscle: "back", side: "right", top: "28%", lineWidth: 40 },
-  { name: "Tríceps", muscle: "triceps", side: "left", top: "28%", lineWidth: 35 },
-  { name: "Lombares", muscle: "lower_back", side: "left", top: "42%", lineWidth: 45 },
-  { name: "Glúteos", muscle: "glutes", side: "right", top: "48%", lineWidth: 50 },
-  { name: "Isquiotibiais", muscle: "hamstrings", side: "left", top: "62%", lineWidth: 45 },
-  { name: "Panturrilhas", muscle: "calves", side: "right", top: "76%", lineWidth: 50 },
+  { name: "Trapézio", muscle: "traps", side: "right", top: "14%" },
+  { name: "Dorsais", muscle: "back", side: "right", top: "28%" },
+  { name: "Tríceps", muscle: "triceps", side: "left", top: "28%" },
+  { name: "Lombares", muscle: "lower_back", side: "left", top: "42%" },
+  { name: "Glúteos", muscle: "glutes", side: "right", top: "48%" },
+  { name: "Isquiotibiais", muscle: "hamstrings", side: "left", top: "62%" },
+  { name: "Panturrilhas", muscle: "calves", side: "right", top: "76%" },
 ];
 
 export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: WorkoutMuscleMapProps) {
@@ -217,8 +210,6 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
 
   const handleLabelClick = (muscle: string) => {
     if (isEditing) return;
-    
-    triggerHapticFeedback();
     
     // Encontrar o label correspondente
     const label = labels.find(l => l.muscle === muscle);
@@ -408,44 +399,25 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
       <div
         id="muscle-map-container"
         className="relative w-full max-w-[600px] flex items-center justify-center"
-        style={{ perspective: "1000px" }}
         onMouseMove={handleDragMove}
         onMouseUp={handleDragEnd}
         onMouseLeave={handleDragEnd}
       >
-        <motion.div
-          className="relative w-full flex items-center justify-center"
-          initial={false}
-          animate={{ rotateY: view === "front" ? 0 : 180 }}
-          transition={{ duration: 0.6, ease: "easeInOut" }}
-          style={{ transformStyle: "preserve-3d" }}
-        >
-          {/* Body Image - transparent background adapts to theme */}
-          <div 
-            className="relative flex items-center justify-center"
-            style={{ backfaceVisibility: "hidden" }}
-          >
-            <img
-              src={view === "front" ? bodyFrontWorkout : bodyBackWorkout}
-              alt={view === "front" ? "Vista frontal do corpo" : "Vista traseira do corpo"}
-              className="w-[85vw] max-w-[320px] sm:w-[280px] md:w-[320px] h-auto object-contain"
-              style={{ 
-                maxHeight: "600px",
-                transform: view === "back" ? "rotateY(180deg)" : "none"
-              }}
-            />
-          </div>
+        {/* Body Image - transparent background adapts to theme */}
+        <div className="relative flex items-center justify-center transition-all duration-300 ease-in-out">
+          <img
+            src={view === "front" ? bodyFrontWorkout : bodyBackWorkout}
+            alt={view === "front" ? "Vista frontal do corpo" : "Vista traseira do corpo"}
+            className="w-[85vw] max-w-[320px] sm:w-[280px] md:w-[320px] h-auto object-contain transition-opacity duration-300"
+            style={{ maxHeight: "600px" }}
+          />
+        </div>
 
         {/* Muscle Labels */}
         <div className="absolute inset-0 pointer-events-none z-20">
-          {labels.map((label, index) => (
-            <motion.div
+          {labels.map((label) => (
+            <div
               key={label.muscle}
-              initial={!isEditing ? { opacity: 0, x: label.side === "left" ? -20 : 20 } : false}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.05, duration: 0.3 }}
-              whileTap={!isEditing ? { scale: 0.95 } : undefined}
-              whileHover={!isEditing ? { scale: 1.05 } : undefined}
               className={`absolute pointer-events-auto ${
                 !label.left && !label.right ? (label.side === "left" ? "left-0" : "right-0") : ""
               } ${isEditing ? "cursor-move hover:scale-105" : "cursor-pointer"} group ${
@@ -460,28 +432,21 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
               onMouseDown={(e) => isEditing && handleDragStart(e, label.muscle)}
             >
               <div className="space-y-1">
-                <motion.div 
-                  className={`flex items-center ${label.side === "left" ? "flex-row" : "flex-row-reverse"} gap-1`}
-                  whileTap={!isEditing ? { scale: 1.1, transition: { duration: 0.1 } } : undefined}
-                >
-                  <motion.div
-                    className={`font-medium px-2 py-1 whitespace-nowrap rounded-md ${
+                <div className={`flex items-center ${label.side === "left" ? "flex-row" : "flex-row-reverse"} gap-1`}>
+                  <div
+                    className={`font-medium px-2 py-1 whitespace-nowrap ${
                       label.side === "left" ? "text-left" : "text-right"
                     } ${
                       selectedMuscle === label.muscle
-                        ? "font-bold text-primary bg-primary/10"
+                        ? "font-bold text-primary"
                         : "text-foreground group-hover:font-semibold group-hover:text-primary"
                     } ${isEditing && !label.hideLabel ? "bg-accent/20 rounded" : ""} ${
                       editingLabel === label.muscle ? "ring-2 ring-primary animate-pulse bg-primary/10" : ""
                     } transition-all duration-200`}
                     style={{ fontSize: `${label.fontSize || labelSize}px` }}
-                    animate={selectedMuscle === label.muscle ? {
-                      scale: [1, 1.05, 1],
-                      transition: { duration: 0.3 }
-                    } : {}}
                   >
                     {label.name}
-                  </motion.div>
+                  </div>
 
                   {!label.hideLine && (
                     <div className={`relative flex items-center ${
@@ -533,7 +498,7 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
                       )}
                     </div>
                   )}
-                </motion.div>
+                </div>
 
                 {/* Edit Controls */}
                 {isEditing && editingLabel === label.muscle && (
@@ -691,10 +656,9 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
                   </Card>
                 )}
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
-        </motion.div>
       </div>
 
       {/* Exercise Modal */}
