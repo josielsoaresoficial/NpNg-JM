@@ -14,6 +14,8 @@ import bodyBackWorkout from "@/assets/body-back-workout-transparent.png";
 import { ExerciseList } from "@/components/ExerciseList";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useMuscleMapSync } from "@/hooks/useMuscleMapSync";
+import { useRecentMuscleActivity } from "@/hooks/useRecentMuscleActivity";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface WorkoutMuscleMapProps {
   view: "front" | "back";
@@ -83,6 +85,9 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
     deviceType: isDeviceReady ? deviceType : 'desktop',
     defaultLabels
   });
+
+  // Hook para rastrear atividade muscular recente
+  const { getActivityLevel, getDaysSinceTraining } = useRecentMuscleActivity(7);
 
   const labelSize = globalSettings.labelSize;
   const lineWidth = globalSettings.lineWidth;
@@ -301,6 +306,25 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
 
   return (
     <div className="relative w-full flex flex-col items-center justify-center py-0 gap-2">
+      {/* Activity Legend */}
+      {!isEditing && (
+        <div className="flex items-center gap-4 text-xs text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full">
+          <span className="font-medium">Progresso:</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-full bg-green-500" />
+            <span>0-2 dias</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-full bg-yellow-500" />
+            <span>3-4 dias</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-full bg-orange-500" />
+            <span>5-7 dias</span>
+          </div>
+        </div>
+      )}
+
       {/* Edit Controls - Mobile e Desktop */}
       <>
         <div className="flex gap-2 flex-wrap justify-center px-2">
@@ -433,6 +457,42 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
             >
               <div className="space-y-1">
                 <div className={`flex items-center ${label.side === "left" ? "flex-row" : "flex-row-reverse"} gap-1`}>
+                  {/* Activity Indicator */}
+                  {(() => {
+                    const activityLevel = getActivityLevel(label.muscle);
+                    const daysSince = getDaysSinceTraining(label.muscle);
+                    if (activityLevel > 0 && !isEditing) {
+                      const colors = {
+                        3: 'bg-green-500', // Treinado recentemente (0-2 dias)
+                        2: 'bg-yellow-500', // Treinado há 3-4 dias
+                        1: 'bg-orange-500', // Treinado há 5-7 dias
+                      };
+                      const labels = {
+                        3: 'Treinado recentemente',
+                        2: 'Treinado há alguns dias',
+                        1: 'Precisa treinar',
+                      };
+                      return (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div 
+                                className={`w-2.5 h-2.5 rounded-full ${colors[activityLevel as 1|2|3]} animate-pulse shadow-sm`}
+                              />
+                            </TooltipTrigger>
+                            <TooltipContent side={label.side === "left" ? "right" : "left"}>
+                              <p className="text-xs">
+                                {labels[activityLevel as 1|2|3]}
+                                {daysSince !== null && ` (${daysSince === 0 ? 'hoje' : daysSince === 1 ? 'ontem' : `${daysSince} dias`})`}
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      );
+                    }
+                    return null;
+                  })()}
+                  
                   <div
                     className={`font-medium px-2 py-1 whitespace-nowrap ${
                       label.side === "left" ? "text-left" : "text-right"
@@ -442,7 +502,7 @@ export function WorkoutMuscleMap({ view, selectedMuscle, onMuscleSelect }: Worko
                         : "text-foreground group-hover:font-semibold group-hover:text-primary"
                     } ${isEditing && !label.hideLabel ? "bg-accent/20 rounded" : ""} ${
                       editingLabel === label.muscle ? "ring-2 ring-primary animate-pulse bg-primary/10" : ""
-                    } transition-all duration-200`}
+                    } ${getActivityLevel(label.muscle) === 3 ? "text-green-600 dark:text-green-400" : ""} transition-all duration-200`}
                     style={{ fontSize: `${label.fontSize || labelSize}px` }}
                   >
                     {label.name}
