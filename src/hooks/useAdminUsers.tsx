@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { logAdminAction } from "./useAdminAuditLog";
 
 export interface AdminUser {
   id: string;
@@ -19,25 +20,53 @@ export interface AdminUser {
   created_at: string;
   updated_at: string;
   onboarding_completed: boolean | null;
-  // Activity stats
   workoutCount?: number;
   mealCount?: number;
   lastActivity?: string | null;
   role?: string | null;
 }
 
+async function verifyAdminAccess(): Promise<boolean> {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    return false;
+  }
+
+  const { data: roleData, error } = await supabase
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', user.id)
+    .eq('role', 'admin')
+    .maybeSingle();
+
+  if (error || !roleData) {
+    return false;
+  }
+
+  return true;
+}
+
 export function useAdminUsers() {
   return useQuery({
     queryKey: ['admin-users'],
     queryFn: async (): Promise<AdminUser[]> => {
-      // Fetch all profiles
+      // Verificar acesso admin antes de qualquer query
+      const isAdmin = await verifyAdminAccess();
+      if (!isAdmin) {
+        throw new Error('Acesso negado: Requer privilégios de administrador');
+      }
+
+      // Log da ação de visualização
+      await logAdminAction({ action_type: 'VIEW_ALL_USERS' });
+
+      // Fetch all profiles (RLS já filtra para admins)
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
         throw profilesError;
       }
 
@@ -91,7 +120,8 @@ export function useAdminUsers() {
         role: rolesMap.get(profile.user_id) || null,
       }));
     },
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 2,
+    retry: false, // Não retry em caso de erro de autorização
   });
 }
 
@@ -100,6 +130,11 @@ export function useSuspendUser() {
 
   return useMutation({
     mutationFn: async ({ userId, reason }: { userId: string; reason: string }) => {
+      const isAdmin = await verifyAdminAccess();
+      if (!isAdmin) {
+        throw new Error('Acesso negado: Requer privilégios de administrador');
+      }
+
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -110,14 +145,20 @@ export function useSuspendUser() {
         .eq('user_id', userId);
 
       if (error) throw error;
+
+      // Log da ação
+      await logAdminAction({
+        action_type: 'SUSPEND_USER',
+        target_user_id: userId,
+        details: { reason },
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       toast.success('Usuário suspenso com sucesso');
     },
     onError: (error) => {
-      console.error('Error suspending user:', error);
-      toast.error('Erro ao suspender usuário');
+      toast.error(error instanceof Error ? error.message : 'Erro ao suspender usuário');
     },
   });
 }
@@ -127,6 +168,11 @@ export function useUnsuspendUser() {
 
   return useMutation({
     mutationFn: async (userId: string) => {
+      const isAdmin = await verifyAdminAccess();
+      if (!isAdmin) {
+        throw new Error('Acesso negado: Requer privilégios de administrador');
+      }
+
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -137,14 +183,18 @@ export function useUnsuspendUser() {
         .eq('user_id', userId);
 
       if (error) throw error;
+
+      await logAdminAction({
+        action_type: 'UNSUSPEND_USER',
+        target_user_id: userId,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       toast.success('Suspensão removida com sucesso');
     },
     onError: (error) => {
-      console.error('Error unsuspending user:', error);
-      toast.error('Erro ao remover suspensão');
+      toast.error(error instanceof Error ? error.message : 'Erro ao remover suspensão');
     },
   });
 }
@@ -154,20 +204,30 @@ export function useTogglePremium() {
 
   return useMutation({
     mutationFn: async ({ userId, isPremium }: { userId: string; isPremium: boolean }) => {
+      const isAdmin = await verifyAdminAccess();
+      if (!isAdmin) {
+        throw new Error('Acesso negado: Requer privilégios de administrador');
+      }
+
       const { error } = await supabase
         .from('profiles')
         .update({ is_premium: isPremium })
         .eq('user_id', userId);
 
       if (error) throw error;
+
+      await logAdminAction({
+        action_type: 'TOGGLE_PREMIUM',
+        target_user_id: userId,
+        details: { is_premium: isPremium },
+      });
     },
     onSuccess: (_, { isPremium }) => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       toast.success(isPremium ? 'Usuário promovido a Premium' : 'Premium removido');
     },
     onError: (error) => {
-      console.error('Error toggling premium:', error);
-      toast.error('Erro ao alterar status premium');
+      toast.error(error instanceof Error ? error.message : 'Erro ao alterar status premium');
     },
   });
 }
@@ -177,14 +237,17 @@ export function useToggleAdminRole() {
 
   return useMutation({
     mutationFn: async ({ userId, isAdmin }: { userId: string; isAdmin: boolean }) => {
+      const hasAccess = await verifyAdminAccess();
+      if (!hasAccess) {
+        throw new Error('Acesso negado: Requer privilégios de administrador');
+      }
+
       if (isAdmin) {
-        // Add admin role
         const { error } = await supabase
           .from('user_roles')
           .insert({ user_id: userId, role: 'admin' });
         if (error) throw error;
       } else {
-        // Remove admin role
         const { error } = await supabase
           .from('user_roles')
           .delete()
@@ -192,14 +255,19 @@ export function useToggleAdminRole() {
           .eq('role', 'admin');
         if (error) throw error;
       }
+
+      await logAdminAction({
+        action_type: 'TOGGLE_ADMIN_ROLE',
+        target_user_id: userId,
+        details: { is_admin: isAdmin },
+      });
     },
     onSuccess: (_, { isAdmin }) => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       toast.success(isAdmin ? 'Usuário promovido a Admin' : 'Privilégios de Admin removidos');
     },
     onError: (error) => {
-      console.error('Error toggling admin role:', error);
-      toast.error('Erro ao alterar role de admin');
+      toast.error(error instanceof Error ? error.message : 'Erro ao alterar role de admin');
     },
   });
 }
