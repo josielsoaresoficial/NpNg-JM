@@ -8,6 +8,7 @@ export const useVoice = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const isCallingRef = useRef(false);
   const safetyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Limpar timeout de segurança
@@ -27,7 +28,14 @@ export const useVoice = () => {
   }, [clearSafetyTimeout]);
 
   const speak = useCallback(async (text: string, voiceProvider: VoiceProvider = 'elevenlabs-male', onSpeechEnd?: () => void) => {
-    if (!text || isPlaying) return;
+    if (!text || isPlaying || isCallingRef.current) return;
+
+    // Verificar se usuário está autenticado antes de chamar a edge function
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      console.log('Usuário não autenticado, pulando síntese de voz');
+      return;
+    }
 
     // Verificar se outra voz já está tocando (previne duplicação)
     const globalPlaying = sessionStorage.getItem('voice_playing') === 'true';
@@ -36,6 +44,7 @@ export const useVoice = () => {
       return;
     }
 
+    isCallingRef.current = true;
     setIsLoading(true);
     sessionStorage.setItem('voice_playing', 'true');
     
@@ -43,6 +52,7 @@ export const useVoice = () => {
     safetyTimeoutRef.current = setTimeout(() => {
       console.warn('⚠️ Timeout de segurança: áudio não iniciou em 15s, resetando estado');
       resetPlayingState();
+      isCallingRef.current = false;
       toast.error('Voz temporariamente indisponível', { duration: 3000 });
     }, 15000);
     
@@ -56,12 +66,14 @@ export const useVoice = () => {
       if (error) {
         console.error('Error generating speech:', error);
         resetPlayingState();
+        isCallingRef.current = false;
         return;
       }
 
       if (!data?.audioContent) {
         console.error('No audio content received');
         resetPlayingState();
+        isCallingRef.current = false;
         return;
       }
 
@@ -91,6 +103,7 @@ export const useVoice = () => {
         sessionStorage.removeItem('voice_playing');
         URL.revokeObjectURL(url);
         clearSafetyTimeout();
+        isCallingRef.current = false;
         onSpeechEnd?.();
         window.dispatchEvent(new Event('speechSynthesisEnded'));
       };
@@ -98,6 +111,7 @@ export const useVoice = () => {
       audio.onerror = (e) => {
         console.error('❌ Erro ao reproduzir áudio:', e);
         resetPlayingState();
+        isCallingRef.current = false;
         URL.revokeObjectURL(url);
       };
 
@@ -105,6 +119,7 @@ export const useVoice = () => {
       try {
         await audio.play();
         console.log('🔊 Audio playing successfully');
+        isCallingRef.current = false;
       } catch (playError: any) {
         if (playError.name === 'NotAllowedError') {
           console.warn('⚠️ Autoplay bloqueado pelo navegador');
@@ -113,11 +128,13 @@ export const useVoice = () => {
           console.error('❌ Erro ao iniciar reprodução:', playError);
         }
         resetPlayingState();
+        isCallingRef.current = false;
         URL.revokeObjectURL(url);
       }
     } catch (error) {
       console.error('Error in speak function:', error);
       resetPlayingState();
+      isCallingRef.current = false;
     }
   }, [isPlaying, resetPlayingState, clearSafetyTimeout]);
 
