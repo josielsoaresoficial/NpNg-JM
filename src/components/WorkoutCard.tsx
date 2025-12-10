@@ -7,8 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/untyped";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-
-// Base images
 import workoutArmsAbs from "@/assets/workout-arms-abs.jpg";
 import workoutChestLegs from "@/assets/workout-chest-legs.jpg";
 import workoutAbsDefined from "@/assets/workout-abs-defined.jpg";
@@ -17,25 +15,6 @@ import workoutFreeweights from "@/assets/workout-freeweights.jpg";
 import workoutBack from "@/assets/workout-back.jpg";
 import workoutLegsFemale from "@/assets/workout-legs-female.jpg";
 import workoutCardio from "@/assets/workout-cardio.jpg";
-import workoutChest from "@/assets/workout-chest.jpg";
-import workoutShoulders from "@/assets/workout-shoulders.jpg";
-import workoutBiceps from "@/assets/workout-biceps.jpg";
-import workoutTriceps from "@/assets/workout-triceps.jpg";
-import workoutHiit from "@/assets/workout-hiit.jpg";
-
-// New additional images for variety
-import workoutAbsCore from "@/assets/workout-abs-core.jpg";
-import workoutAbsCrunch from "@/assets/workout-abs-crunch.jpg";
-import workoutBackPulldown from "@/assets/workout-back-pulldown.jpg";
-import workoutBackRow from "@/assets/workout-back-row.jpg";
-import workoutCardioRun from "@/assets/workout-cardio-run.jpg";
-import workoutCardioBike from "@/assets/workout-cardio-bike.jpg";
-import workoutFullbodyFunctional from "@/assets/workout-fullbody-functional.jpg";
-import workoutFullbodyCircuit from "@/assets/workout-fullbody-circuit.jpg";
-import workoutLegsPress from "@/assets/workout-legs-press.jpg";
-import workoutLegsLunge from "@/assets/workout-legs-lunge.jpg";
-import workoutStrengthDeadlift from "@/assets/workout-strength-deadlift.jpg";
-import workoutHiitJump from "@/assets/workout-hiit-jump.jpg";
 
 interface RippleProps {
   x: number;
@@ -53,25 +32,6 @@ interface WorkoutCardProps {
   difficulty: string;
   exercises_count: number;
 }
-
-// Image arrays for each category - ensures variety within same category
-const absImages = [workoutAbsDefined, workoutAbsCore, workoutAbsCrunch, workoutArmsAbs];
-const backImages = [workoutBack, workoutBackPulldown, workoutBackRow];
-const cardioImages = [workoutCardio, workoutCardioRun, workoutCardioBike];
-const fullbodyImages = [workoutFullbodyFunctional, workoutFullbodyCircuit, workoutFreeweights, workoutChestLegs];
-const legsImages = [workoutLegsFemale, workoutLegsGlutes, workoutLegsPress, workoutLegsLunge];
-const strengthImages = [workoutStrengthDeadlift, workoutFreeweights, workoutChest, workoutBack];
-const hiitImages = [workoutHiit, workoutHiitJump, workoutCardioRun, workoutFullbodyCircuit];
-
-// Helper function to get hash from ID for image selection
-const getIdHash = (id: string): number => {
-  let hash = 0;
-  for (let i = 0; i < id.length; i++) {
-    hash = ((hash << 5) - hash) + id.charCodeAt(i);
-    hash = hash & hash;
-  }
-  return Math.abs(hash);
-};
 
 export function WorkoutCard({
   id,
@@ -150,88 +110,20 @@ export function WorkoutCard({
     return labels[level] || level;
   };
 
-  // Get unique image based on workout name, category, and ID hash
-  const getCategoryImage = (cat: string, workoutName: string, workoutId: string) => {
-    const nameLower = workoutName?.toLowerCase() || '';
-    const hash = getIdHash(workoutId);
-    
-    // Specific muscle group detection with hash-based variety
-    if (nameLower.includes('peitoral') || nameLower.includes('peito') || nameLower.includes('chest') || nameLower.includes('supino')) {
-      return workoutChest;
-    }
-    if (nameLower.includes('ombro') || nameLower.includes('deltóide') || nameLower.includes('deltoide') || nameLower.includes('shoulder')) {
-      return workoutShoulders;
-    }
-    if (nameLower.includes('bíceps') || nameLower.includes('biceps') || nameLower.includes('bicep')) {
-      return workoutBiceps;
-    }
-    if (nameLower.includes('tríceps') || nameLower.includes('triceps') || nameLower.includes('tricep')) {
-      return workoutTriceps;
-    }
-    
-    // Categories with multiple images - use hash for variety
-    if (nameLower.includes('abdômen') || nameLower.includes('abdomen') || nameLower.includes('core') || nameLower.includes('abs') || nameLower.includes('abdominal')) {
-      return absImages[hash % absImages.length];
-    }
-    if (nameLower.includes('costas') || nameLower.includes('dorsal') || nameLower.includes('back')) {
-      return backImages[hash % backImages.length];
-    }
-    if (nameLower.includes('pernas') || nameLower.includes('perna') || nameLower.includes('quadríceps') || nameLower.includes('quadriceps') || nameLower.includes('panturrilha') || nameLower.includes('legs')) {
-      return legsImages[hash % legsImages.length];
-    }
-    if (nameLower.includes('glúteos') || nameLower.includes('gluteos') || nameLower.includes('bumbum') || nameLower.includes('glutes')) {
-      return legsImages[hash % legsImages.length];
-    }
-    if (nameLower.includes('hiit') || nameLower.includes('alta intensidade') || nameLower.includes('high intensity')) {
-      return hiitImages[hash % hiitImages.length];
-    }
-    if (nameLower.includes('cardio') || nameLower.includes('aeróbico') || nameLower.includes('aerobico') || nameLower.includes('corrida')) {
-      return cardioImages[hash % cardioImages.length];
-    }
-    if (nameLower.includes('full body') || nameLower.includes('corpo todo') || nameLower.includes('total body') || nameLower.includes('fullbody')) {
-      return fullbodyImages[hash % fullbodyImages.length];
-    }
-    if (nameLower.includes('força') || nameLower.includes('forca') || nameLower.includes('strength')) {
-      return strengthImages[hash % strengthImages.length];
-    }
-    if (nameLower.includes('braço') || nameLower.includes('braco') || nameLower.includes('arms')) {
-      return workoutArmsAbs;
-    }
-    
-    // Fallback by category with hash variety
-    switch (cat) {
-      case "7_minute":
-      case "7min":
-        return cardioImages[hash % cardioImages.length];
-      case "full_body":
-        return fullbodyImages[hash % fullbodyImages.length];
-      case "abs":
-        return absImages[hash % absImages.length];
-      case "hiit":
-        return hiitImages[hash % hiitImages.length];
-      case "strength":
-        return strengthImages[hash % strengthImages.length];
-      case "legs":
-        return legsImages[hash % legsImages.length];
-      case "back":
-        return backImages[hash % backImages.length];
-      case "cardio":
-        return cardioImages[hash % cardioImages.length];
-      case "chest":
-        return workoutChest;
-      case "arms":
-        return workoutArmsAbs;
-      case "shoulders":
-        return workoutShoulders;
-      case "biceps":
-        return workoutBiceps;
-      case "triceps":
-        return workoutTriceps;
-      default:
-        // Use all images for unknown categories with hash
-        const allImages = [...absImages, ...backImages, ...cardioImages, ...fullbodyImages, ...legsImages];
-        return allImages[hash % allImages.length];
-    }
+  const getCategoryImage = (cat: string) => {
+    const images: Record<string, string> = {
+      "7_minute": workoutCardio,
+      full_body: workoutFreeweights,
+      abs: workoutAbsDefined,
+      hiit: workoutCardio,
+      strength: workoutFreeweights,
+      legs: workoutLegsGlutes,
+      back: workoutBack,
+      cardio: workoutCardio,
+      chest: workoutChestLegs,
+      arms: workoutArmsAbs,
+    };
+    return images[cat] || workoutFreeweights;
   };
 
   const handleSaveName = async () => {
@@ -321,7 +213,7 @@ export function WorkoutCard({
         {/* Imagem de fundo */}
         <div className="absolute inset-0">
           <img 
-            src={getCategoryImage(category, name, id)} 
+            src={getCategoryImage(category)} 
             alt={name}
             className="w-full h-full object-cover object-center"
           />
